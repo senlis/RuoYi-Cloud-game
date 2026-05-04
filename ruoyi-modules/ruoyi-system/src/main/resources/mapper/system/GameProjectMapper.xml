@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GameProjectMapper">
+
+    <resultMap type="GameProject" id="GameProjectResult">
+        <result property="projectId"     column="project_id"     />
+        <result property="projectCode"   column="project_code"   />
+        <result property="projectName"   column="project_name"   />
+        <result property="status"        column="status"         />
+        <result property="sort"          column="sort"           />
+        <result property="dynamicFields" column="dynamic_fields" />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+    </resultMap>
+
+    <sql id="selectGameProjectVo">
+        select project_id, project_code, project_name, status, sort, dynamic_fields,
+               create_by, create_time, update_by, update_time, remark
+        from game_project
+    </sql>
+
+    <select id="selectGameProjectList" parameterType="GameProject" resultMap="GameProjectResult">
+        <include refid="selectGameProjectVo"/>
+        <where>
+            <if test="projectCode != null and projectCode != ''">
+                AND project_code like concat('%', #{projectCode}, '%')
+            </if>
+            <if test="projectName != null and projectName != ''">
+                AND project_name like concat('%', #{projectName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND create_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND create_time &lt;= #{params.endTime}
+            </if>
+            <if test="params.authProjectIds != null and params.authProjectIds.size() > 0">
+                AND project_id IN
+                <foreach item="id" collection="params.authProjectIds" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        order by sort asc
+    </select>
+
+    <select id="selectGameProjectById" parameterType="Long" resultMap="GameProjectResult">
+        <include refid="selectGameProjectVo"/>
+        where project_id = #{projectId}
+    </select>
+
+    <select id="selectGameProjectByCode" parameterType="String" resultMap="GameProjectResult">
+        <include refid="selectGameProjectVo"/>
+        where project_code = #{projectCode}
+    </select>
+
+    <insert id="insertGameProject" parameterType="GameProject">
+        insert into game_project (
+            <if test="projectCode != null and projectCode != ''">project_code,</if>
+            <if test="projectName != null and projectName != ''">project_name,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="sort != null">sort,</if>
+            <if test="dynamicFields != null and dynamicFields != ''">dynamic_fields,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        )values(
+            <if test="projectCode != null and projectCode != ''">#{projectCode},</if>
+            <if test="projectName != null and projectName != ''">#{projectName},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="dynamicFields != null and dynamicFields != ''">#{dynamicFields},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateGameProject" parameterType="GameProject">
+        update game_project
+        <set>
+            <if test="projectCode != null and projectCode != ''">project_code = #{projectCode},</if>
+            <if test="projectName != null and projectName != ''">project_name = #{projectName},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="dynamicFields != null and dynamicFields != ''">dynamic_fields = #{dynamicFields},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where project_id = #{projectId}
+    </update>
+
+    <delete id="deleteGameProjectById" parameterType="Long">
+        delete from game_project where project_id = #{projectId}
+    </delete>
+
+    <delete id="deleteGameProjectByIds" parameterType="Long">
+        delete from game_project where project_id in
+        <foreach item="projectId" collection="array" open="(" separator="," close=")">
+            #{projectId}
+        </foreach>
+    </delete>
+
+</mapper>

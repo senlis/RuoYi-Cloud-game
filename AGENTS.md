@@ -1,6 +1,6 @@
 # AGENTS.md
 
-本文件为 Qoder (qoder.com) 在本仓库中工作时提供指导。
+你好，这是一个基于 Spring Cloud 的游戏通用管理后台项目。本文档是你在本仓库中进行代码生成、开发、修改的唯一最高准则，必须严格遵守所有规则。
 
 ## 构建与运行命令
 
@@ -19,13 +19,22 @@ java -Xms512m -Xmx1024m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m -Dfile.
 
 Windows 批处理脚本位于 `bin/` 目录：`run-gateway.bat`、`run-auth.bat`、`run-modules-system.bat`、`run-modules-gen.bat`、`run-modules-job.bat`、`run-modules-file.bat`、`run-monitor.bat`。
 
-### 前端 (ruoyi-ui/, Vue 2 + Element UI)
+### 前端 (ruoyi-ui/, Vue 3 + Element UI)
 
 ```bash
-cd ruoyi-ui
-npm install
-npm run dev          # 开发服务器，端口 80
-npm run build:prod   # 生产构建 -> dist/
+# 进入项目目录
+cd ruoyi-vue3
+
+# 安装依赖
+yarn --registry=https://registry.npmmirror.com
+
+# 启动服务
+yarn dev
+
+# 构建测试环境 yarn build:stage
+# 构建生产环境 yarn build:prod
+# 前端访问地址 http://localhost:80
+
 ```
 
 环境变量文件：`.env.development`（API 前缀 `/dev-api`）、`.env.production`（`/prod-api`）。
@@ -53,6 +62,30 @@ docker-compose up -d ruoyi-gateway ruoyi-auth ruoyi-modules-system ruoyi-nginx
                                               |
                                     Redis(:6379) -- JWT 令牌缓存与会话
 ```
+## 3. 代码规范（强制遵守）
+### 3.1 数据库规范
+- 业务表命名：前缀 t_ + 业务名（如 t_item_config）
+- 字段命名：蛇形命名法（snake_case），如 item_name、created_at
+- 每张[]()表必须包含：id(BIGINT 自增主键)、created_at、updated_at
+- 索引：唯一编码必须建立唯一索引
+
+### 3.2 Java 代码分层规范
+- Entity：com.game.admin.module.game.entity + MyBatis-Plus 注解（@TableName/@TableId）
+- Mapper：com.game.admin.module.game.mapper 继承 BaseMapper
+- Service：接口继承 IService，实现类继承 ServiceImpl
+- DTO/VO：com.game.admin.module.game.domain.dto / domain.vo
+- Controller：com.game.admin.module.game.controller
+
+### 3.3 API 接口规范
+- 请求路径：/api/module/{业务名}/{接口名}（如 /api/module/item/page）
+- 响应格式：所有 REST 接口返回 `R<T>`（来自 common-core）或 `AjaxResult`。使用 `R.ok(data)` / `R.fail(msg)`。
+- 分页接口：固定参数 pageNum、pageSize，固定返回 PageResult<T>
+- 请求方法：查询 GET、新增 POST、修改 PUT、删除 DELETE
+
+### 3.4 通用规则
+- 所有代码必须添加清晰注释，类和方法必填注释
+- 禁止硬编码，禁止自定义未声明的常量
+- 禁止引入项目 pom.xml 以外的第三方依赖
 
 ### 服务端口映射
 

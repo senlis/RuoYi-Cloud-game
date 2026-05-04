@@ -1,0 +1,2 @@
+-- This file has been moved to sql/game_menu_init.sql
+-- Please refer to: sql/game_menu_init.sql

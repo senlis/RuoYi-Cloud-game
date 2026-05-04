@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GameChannelMapper">
+
+    <resultMap type="GameChannel" id="GameChannelResult">
+        <result property="channelId"     column="channel_id"     />
+        <result property="projectId"     column="project_id"     />
+        <result property="channelCode"   column="channel_code"   />
+        <result property="channelName"   column="channel_name"   />
+        <result property="channelType"   column="channel_type"   />
+        <result property="status"        column="status"         />
+        <result property="contactPerson" column="contact_person" />
+        <result property="contactPhone"  column="contact_phone"  />
+        <result property="sort"          column="sort"           />
+        <result property="dynamicFields" column="dynamic_fields" />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+        <result property="projectName"   column="project_name"   />
+    </resultMap>
+
+    <sql id="selectGameChannelVo">
+        select c.channel_id, c.project_id, c.channel_code, c.channel_name, c.channel_type,
+               c.status, c.contact_person, c.contact_phone, c.sort, c.dynamic_fields,
+               c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+               p.project_name
+        from game_channel c
+        left join game_project p on c.project_id = p.project_id
+    </sql>
+
+    <select id="selectGameChannelList" parameterType="GameChannel" resultMap="GameChannelResult">
+        <include refid="selectGameChannelVo"/>
+        <where>
+            <if test="channelCode != null and channelCode != ''">
+                AND c.channel_code like concat('%', #{channelCode}, '%')
+            </if>
+            <if test="channelName != null and channelName != ''">
+                AND c.channel_name like concat('%', #{channelName}, '%')
+            </if>
+            <if test="channelType != null and channelType != ''">
+                AND c.channel_type = #{channelType}
+            </if>
+            <if test="projectId != null">
+                AND c.project_id = #{projectId}
+            </if>
+            <if test="status != null and status != ''">
+                AND c.status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND c.create_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND c.create_time &lt;= #{params.endTime}
+            </if>
+            <if test="params.authChannelIds != null and params.authChannelIds.size() > 0">
+                AND c.channel_id IN
+                <foreach item="id" collection="params.authChannelIds" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        order by c.sort asc
+    </select>
+
+    <select id="selectGameChannelById" parameterType="Long" resultMap="GameChannelResult">
+        <include refid="selectGameChannelVo"/>
+        where c.channel_id = #{channelId}
+    </select>
+
+    <select id="selectGameChannelByProjectId" parameterType="Long" resultMap="GameChannelResult">
+        <include refid="selectGameChannelVo"/>
+        where c.project_id = #{projectId}
+        order by c.sort asc
+    </select>
+
+    <select id="selectGameChannelByCode" parameterType="String" resultMap="GameChannelResult">
+        <include refid="selectGameChannelVo"/>
+        where c.channel_code = #{channelCode}
+    </select>
+
+    <insert id="insertGameChannel" parameterType="GameChannel">
+        insert into game_channel (
+            <if test="projectId != null">project_id,</if>
+            <if test="channelCode != null and channelCode != ''">channel_code,</if>
+            <if test="channelName != null and channelName != ''">channel_name,</if>
+            <if test="channelType != null and channelType != ''">channel_type,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="contactPerson != null and contactPerson != ''">contact_person,</if>
+            <if test="contactPhone != null and contactPhone != ''">contact_phone,</if>
+            <if test="sort != null">sort,</if>
+            <if test="dynamicFields != null and dynamicFields != ''">dynamic_fields,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        )values(
+            <if test="projectId != null">#{projectId},</if>
+            <if test="channelCode != null and channelCode != ''">#{channelCode},</if>
+            <if test="channelName != null and channelName != ''">#{channelName},</if>
+            <if test="channelType != null and channelType != ''">#{channelType},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="contactPerson != null and contactPerson != ''">#{contactPerson},</if>
+            <if test="contactPhone != null and contactPhone != ''">#{contactPhone},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="dynamicFields != null and dynamicFields != ''">#{dynamicFields},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateGameChannel" parameterType="GameChannel">
+        update game_channel
+        <set>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="channelCode != null and channelCode != ''">channel_code = #{channelCode},</if>
+            <if test="channelName != null and channelName != ''">channel_name = #{channelName},</if>
+            <if test="channelType != null and channelType != ''">channel_type = #{channelType},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="contactPerson != null">contact_person = #{contactPerson},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="dynamicFields != null">dynamic_fields = #{dynamicFields},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where channel_id = #{channelId}
+    </update>
+
+    <delete id="deleteGameChannelById" parameterType="Long">
+        delete from game_channel where channel_id = #{channelId}
+    </delete>
+
+    <delete id="deleteGameChannelByIds" parameterType="Long">
+        delete from game_channel where channel_id in
+        <foreach item="channelId" collection="array" open="(" separator="," close=")">
+            #{channelId}
+        </foreach>
+    </delete>
+
+    <select id="countByChannelId" parameterType="Long" resultType="int">
+        select count(*) from game_region where channel_id = #{channelId}
+    </select>
+
+</mapper>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GameServerMapper">
+
+    <resultMap type="GameServer" id="GameServerResult">
+        <result property="id"           column="id"                 />
+        <result property="serverId"     column="server_id"          />
+        <result property="regionId"     column="region_id"          />
+        <result property="serverName"    column="server_name"    />
+        <result property="serverType"    column="server_type"    />
+        <result property="status"        column="status"         />
+        <result property="openTime"      column="open_time"      />
+        <result property="backendUrl"    column="backend_url"    />
+        <result property="gameDbConfig"  column="game_db_config" />
+        <result property="logDbConfig"   column="log_db_config"  />
+        <result property="mergeInfo"     column="merge_info"     />
+        <result property="sort"          column="sort"           />
+        <result property="dynamicFields" column="dynamic_fields" />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+        <result property="regionName"    column="region_name"    />
+    </resultMap>
+
+    <sql id="selectGameServerVo">
+        select s.id, s.server_id, s.region_id,
+               s.server_name, s.server_type, s.status,
+               s.open_time, s.backend_url, s.game_db_config, s.log_db_config,
+               s.merge_info, s.sort, s.dynamic_fields,
+               s.create_by, s.create_time, s.update_by, s.update_time, s.remark,
+               r.region_name
+        from game_server s
+        left join game_region r on s.region_id = r.region_id
+    </sql>
+
+    <select id="selectGameServerList" parameterType="GameServer" resultMap="GameServerResult">
+        <include refid="selectGameServerVo"/>
+        <where>
+            <if test="serverId != null">
+                AND s.server_id = #{serverId}
+            </if>
+            <if test="serverName != null and serverName != ''">
+                AND s.server_name like concat('%', #{serverName}, '%')
+            </if>
+            <if test="serverType != null and serverType != ''">
+                AND s.server_type = #{serverType}
+            </if>
+            <if test="regionId != null">
+                AND s.region_id = #{regionId}
+            </if>
+            <if test="status != null and status != ''">
+                AND s.status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND s.create_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND s.create_time &lt;= #{params.endTime}
+            </if>
+        </where>
+        order by s.region_id asc, s.server_id asc
+    </select>
+
+    <select id="selectGameServerById" parameterType="Long" resultMap="GameServerResult">
+        <include refid="selectGameServerVo"/>
+        where s.id = #{id}
+    </select>
+
+    <select id="selectGameServerByRegionId" parameterType="Long" resultMap="GameServerResult">
+        <include refid="selectGameServerVo"/>
+        where s.region_id = #{regionId}
+        order by s.region_id asc, s.server_id asc
+    </select>
+
+    <select id="selectGameServerByCode" parameterType="Integer" resultMap="GameServerResult">
+        <include refid="selectGameServerVo"/>
+        where s.server_id = #{serverId}
+    </select>
+
+    <select id="selectGameServerByRegionAndId" resultMap="GameServerResult">
+        <include refid="selectGameServerVo"/>
+        where s.region_id = #{regionId} and s.server_id = #{serverId}
+    </select>
+
+    <insert id="insertGameServer" parameterType="GameServer" useGeneratedKeys="true" keyProperty="id">
+        insert into game_server (
+            <if test="serverId != null">server_id,</if>
+            <if test="regionId != null">region_id,</if>
+            <if test="serverName != null and serverName != ''">server_name,</if>
+            <if test="serverType != null and serverType != ''">server_type,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="openTime != null">open_time,</if>
+            <if test="backendUrl != null and backendUrl != ''">backend_url,</if>
+            <if test="gameDbConfig != null and gameDbConfig != ''">game_db_config,</if>
+            <if test="logDbConfig != null and logDbConfig != ''">log_db_config,</if>
+            <if test="mergeInfo != null and mergeInfo != ''">merge_info,</if>
+            <if test="sort != null">sort,</if>
+            <if test="dynamicFields != null and dynamicFields != ''">dynamic_fields,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        )values(
+            <if test="serverId != null">#{serverId},</if>
+            <if test="regionId != null">#{regionId},</if>
+            <if test="serverName != null and serverName != ''">#{serverName},</if>
+            <if test="serverType != null and serverType != ''">#{serverType},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="openTime != null">#{openTime},</if>
+            <if test="backendUrl != null and backendUrl != ''">#{backendUrl},</if>
+            <if test="gameDbConfig != null and gameDbConfig != ''">#{gameDbConfig},</if>
+            <if test="logDbConfig != null and logDbConfig != ''">#{logDbConfig},</if>
+            <if test="mergeInfo != null and mergeInfo != ''">#{mergeInfo},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="dynamicFields != null and dynamicFields != ''">#{dynamicFields},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateGameServer" parameterType="GameServer">
+        update game_server
+        <set>
+            <if test="serverId != null">server_id = #{serverId},</if>
+            <if test="regionId != null">region_id = #{regionId},</if>
+            <if test="serverName != null and serverName != ''">server_name = #{serverName},</if>
+            <if test="serverType != null and serverType != ''">server_type = #{serverType},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="openTime != null">open_time = #{openTime},</if>
+            <if test="backendUrl != null">backend_url = #{backendUrl},</if>
+            <if test="gameDbConfig != null">game_db_config = #{gameDbConfig},</if>
+            <if test="logDbConfig != null">log_db_config = #{logDbConfig},</if>
+            <if test="mergeInfo != null">merge_info = #{mergeInfo},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="dynamicFields != null">dynamic_fields = #{dynamicFields},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGameServerById" parameterType="Long">
+        delete from game_server where id = #{id}
+    </delete>
+
+    <delete id="deleteGameServerByIds" parameterType="Long">
+        delete from game_server where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

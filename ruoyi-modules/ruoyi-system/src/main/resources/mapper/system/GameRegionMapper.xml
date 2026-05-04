@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GameRegionMapper">
+
+    <resultMap type="GameRegion" id="GameRegionResult">
+        <result property="regionId"      column="region_id"      />
+        <result property="channelId"     column="channel_id"     />
+        <result property="projectId"     column="project_id"     />
+        <result property="regionCode"    column="region_code"    />
+        <result property="regionName"    column="region_name"    />
+        <result property="status"        column="status"         />
+        <result property="sort"          column="sort"           />
+        <result property="dynamicFields" column="dynamic_fields" />
+        <result property="servers"       column="servers"       />
+        <result property="proxyRegionKey" column="proxy_region_key" />
+        <result property="config"        column="config"        />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+        <result property="projectName"   column="project_name"   />
+        <result property="channelName"    column="channel_name"    />
+        <result property="proxyRegionName" column="proxy_region_name" />
+    </resultMap>
+
+    <sql id="selectGameRegionVo">
+        select r.region_id, r.channel_id, r.project_id, r.region_code, r.region_name,
+               r.status, r.sort, r.dynamic_fields, r.servers, r.proxy_region_key, r.config,
+               r.create_by, r.create_time, r.update_by, r.update_time, r.remark,
+               p.project_name, c.channel_name,
+               pr.region_name as proxy_region_name
+        from game_region r
+        left join game_project p on r.project_id = p.project_id
+        left join game_channel c on r.channel_id = c.channel_id
+        left join game_region pr on r.proxy_region_key = pr.region_code
+    </sql>
+
+    <select id="selectGameRegionList" parameterType="GameRegion" resultMap="GameRegionResult">
+        <include refid="selectGameRegionVo"/>
+        <where>
+            <if test="regionCode != null and regionCode != ''">
+                AND r.region_code like concat('%', #{regionCode}, '%')
+            </if>
+            <if test="regionName != null and regionName != ''">
+                AND r.region_name like concat('%', #{regionName}, '%')
+            </if>
+            <if test="channelId != null">
+                AND r.channel_id = #{channelId}
+            </if>
+            <if test="projectId != null">
+                AND r.project_id = #{projectId}
+            </if>
+            <if test="status != null and status != ''">
+                AND r.status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND r.create_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND r.create_time &lt;= #{params.endTime}
+            </if>
+            <if test="params.authRegionIds != null and params.authRegionIds.size() > 0">
+                AND r.region_id IN
+                <foreach item="id" collection="params.authRegionIds" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        order by r.sort asc
+    </select>
+
+    <select id="selectGameRegionById" parameterType="Long" resultMap="GameRegionResult">
+        <include refid="selectGameRegionVo"/>
+        where r.region_id = #{regionId}
+    </select>
+
+    <select id="selectGameRegionByChannelId" parameterType="Long" resultMap="GameRegionResult">
+        <include refid="selectGameRegionVo"/>
+        where r.channel_id = #{channelId}
+        order by r.sort asc
+    </select>
+
+    <select id="selectGameRegionByKey" parameterType="String" resultMap="GameRegionResult">
+        <include refid="selectGameRegionVo"/>
+        where r.region_code = #{proxyRegionKey}
+    </select>
+
+    <select id="selectGameRegionByCode" parameterType="String" resultMap="GameRegionResult">
+        <include refid="selectGameRegionVo"/>
+        where r.region_code = #{regionCode}
+    </select>
+
+    <insert id="insertGameRegion" parameterType="GameRegion">
+        insert into game_region (
+            <if test="channelId != null">channel_id,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="regionCode != null and regionCode != ''">region_code,</if>
+            <if test="regionName != null and regionName != ''">region_name,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="sort != null">sort,</if>
+            <if test="dynamicFields != null and dynamicFields != ''">dynamic_fields,</if>
+            <if test="servers != null and servers != ''">servers,</if>
+            <if test="proxyRegionKey != null and proxyRegionKey != ''">proxy_region_key,</if>
+            <if test="config != null and config != ''">config,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        )values(
+            <if test="channelId != null">#{channelId},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="regionCode != null and regionCode != ''">#{regionCode},</if>
+            <if test="regionName != null and regionName != ''">#{regionName},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="dynamicFields != null and dynamicFields != ''">#{dynamicFields},</if>
+            <if test="servers != null and servers != ''">#{servers},</if>
+            <if test="proxyRegionKey != null and proxyRegionKey != ''">#{proxyRegionKey},</if>
+            <if test="config != null and config != ''">#{config},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateGameRegion" parameterType="GameRegion">
+        update game_region
+        <set>
+            <if test="channelId != null">channel_id = #{channelId},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="regionCode != null and regionCode != ''">region_code = #{regionCode},</if>
+            <if test="regionName != null and regionName != ''">region_name = #{regionName},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="dynamicFields != null">dynamic_fields = #{dynamicFields},</if>
+            <if test="servers != null">servers = #{servers},</if>
+            <if test="proxyRegionKey != null">proxy_region_key = #{proxyRegionKey},</if>
+            <if test="config != null">config = #{config},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where region_id = #{regionId}
+    </update>
+
+    <delete id="deleteGameRegionById" parameterType="Long">
+        delete from game_region where region_id = #{regionId}
+    </delete>
+
+    <delete id="deleteGameRegionByIds" parameterType="Long">
+        delete from game_region where region_id in
+        <foreach item="regionId" collection="array" open="(" separator="," close=")">
+            #{regionId}
+        </foreach>
+    </delete>
+
+    <select id="countByRegionId" parameterType="Long" resultType="int">
+        select count(*) from game_server where region_id = #{regionId}
+    </select>
+
+</mapper>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GameRoleAuthMapper">
+
+    <resultMap type="GameRoleAuth" id="GameRoleAuthResult">
+        <result property="authId"      column="auth_id"      />
+        <result property="roleId"      column="role_id"      />
+        <result property="entityType"  column="entity_type"  />
+        <result property="entityId"    column="entity_id"    />
+    </resultMap>
+
+    <sql id="selectGameRoleAuthVo">
+        select auth_id, role_id, entity_type, entity_id
+        from game_role_auth
+    </sql>
+
+    <select id="selectGameRoleAuthList" parameterType="GameRoleAuth" resultMap="GameRoleAuthResult">
+        <include refid="selectGameRoleAuthVo"/>
+        <where>
+            <if test="roleId != null">
+                AND role_id = #{roleId}
+            </if>
+            <if test="entityType != null and entityType != ''">
+                AND entity_type = #{entityType}
+            </if>
+        </where>
+        order by auth_id asc
+    </select>
+
+    <select id="selectGameRoleAuthById" parameterType="Long" resultMap="GameRoleAuthResult">
+        <include refid="selectGameRoleAuthVo"/>
+        where auth_id = #{authId}
+    </select>
+
+    <select id="selectByRoleAndType" resultType="Long">
+        select entity_id from game_role_auth
+        where role_id = #{roleId}
+          and entity_type = #{entityType}
+        order by entity_id asc
+    </select>
+
+    <select id="selectByUserIdAndType" resultType="Long">
+        select distinct a.entity_id
+        from game_role_auth a
+        inner join sys_user_role ur on a.role_id = ur.role_id
+        where ur.user_id = #{userId}
+          and a.entity_type = #{entityType}
+        order by a.entity_id asc
+    </select>
+
+    <insert id="insertGameRoleAuth" parameterType="GameRoleAuth">
+        insert into game_role_auth (
+            role_id,
+            entity_type,
+            entity_id
+        ) values (
+            #{roleId},
+            #{entityType},
+            #{entityId}
+        )
+    </insert>
+
+    <delete id="deleteGameRoleAuthByIds" parameterType="Long">
+        delete from game_role_auth where auth_id in
+        <foreach item="authId" collection="array" open="(" separator="," close=")">
+            #{authId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByRoleId" parameterType="Long">
+        delete from game_role_auth where role_id = #{roleId}
+    </delete>
+
+    <delete id="deleteByRoleAndType" parameterType="map">
+        delete from game_role_auth
+        where role_id = #{roleId}
+          and entity_type = #{entityType}
+    </delete>
+
+    <select id="countAdminRoleByUserId" parameterType="Long" resultType="int">
+        select count(1) from sys_user_role
+        where user_id = #{userId}
+          and role_id = 1
+    </select>
+
+</mapper>

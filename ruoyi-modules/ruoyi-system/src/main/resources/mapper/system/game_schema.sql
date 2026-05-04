@@ -1,0 +1,2 @@
+-- This file has been moved to sql/game_schema.sql
+-- Please refer to: sql/game_schema.sql
