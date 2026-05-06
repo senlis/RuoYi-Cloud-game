@@ -23,3 +23,19 @@ ALTER TABLE game_server
   CHANGE COLUMN server_code server_id int(11) NOT NULL COMMENT '服务器ID(数字编码)' AFTER id,
   DROP INDEX idx_region,
   ADD UNIQUE KEY uk_server_region (server_id, region_id);
+
+-- 5. game_region 新增服务器ID范围
+ALTER TABLE game_region
+  ADD COLUMN server_id_start int(11) DEFAULT NULL COMMENT '服务器ID起始值' AFTER sort,
+  ADD COLUMN server_id_end int(11) DEFAULT NULL COMMENT '服务器ID结束值' AFTER server_id_start;
+
+-- 6. game_server 新增版本号和合服母服字段
+ALTER TABLE game_server
+  ADD COLUMN current_version varchar(50) DEFAULT NULL COMMENT '当前版本号' AFTER log_db_config,
+  ADD COLUMN merge_parent_id int(11) DEFAULT NULL COMMENT '合服母服ID' AFTER current_version;
+
+-- 7. game_server 新增服务器地址/端口/部署路径
+ALTER TABLE game_server
+  ADD COLUMN server_address varchar(255) DEFAULT NULL COMMENT '服务器地址' AFTER backend_url,
+  ADD COLUMN port int(11) DEFAULT NULL COMMENT '端口' AFTER server_address,
+  ADD COLUMN deploy_path varchar(255) DEFAULT NULL COMMENT '部署路径' AFTER port;

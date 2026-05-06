@@ -85,6 +85,15 @@ public class GameRegionController extends BaseController
     }
 
     /**
+     * 获取下一个可用的服务器ID范围
+     */
+    @GetMapping("/nextRange")
+    public AjaxResult nextRange()
+    {
+        return success(gameRegionService.getNextAvailableRange());
+    }
+
+    /**
      * 修改游戏分区
      */
     @RequiresPermissions("game:region:edit")

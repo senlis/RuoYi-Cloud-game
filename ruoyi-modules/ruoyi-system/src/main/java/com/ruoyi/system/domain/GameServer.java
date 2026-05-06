@@ -52,11 +52,34 @@ public class GameServer extends BaseEntity
     @Excel(name = "后台地址")
     private String backendUrl;
 
+    /** 服务器地址 */
+    @Excel(name = "服务器地址")
+    private String serverAddress;
+
+    /** 端口 */
+    @Excel(name = "端口")
+    private Integer port;
+
+    /** 部署路径 */
+    @Excel(name = "部署路径")
+    private String deployPath;
+
     /** 游戏数据库配置(JSON) */
     private String gameDbConfig;
 
     /** 游戏日志数据库配置(JSON) */
     private String logDbConfig;
+
+    /** 当前版本号 */
+    @Excel(name = "当前版本")
+    private String currentVersion;
+
+    /** 合服母服ID */
+    @Excel(name = "合服母服ID")
+    private Integer mergeParentId;
+
+    /** 合服母服名称(用于列表显示) */
+    private String mergeParentName;
 
     /** 合服信息(JSON数组) */
     private String mergeInfo;
@@ -154,6 +177,36 @@ public class GameServer extends BaseEntity
         this.backendUrl = backendUrl;
     }
 
+    public String getServerAddress()
+    {
+        return serverAddress;
+    }
+
+    public void setServerAddress(String serverAddress)
+    {
+        this.serverAddress = serverAddress;
+    }
+
+    public Integer getPort()
+    {
+        return port;
+    }
+
+    public void setPort(Integer port)
+    {
+        this.port = port;
+    }
+
+    public String getDeployPath()
+    {
+        return deployPath;
+    }
+
+    public void setDeployPath(String deployPath)
+    {
+        this.deployPath = deployPath;
+    }
+
     public String getGameDbConfig()
     {
         return gameDbConfig;
@@ -172,6 +225,36 @@ public class GameServer extends BaseEntity
     public void setLogDbConfig(String logDbConfig)
     {
         this.logDbConfig = logDbConfig;
+    }
+
+    public String getCurrentVersion()
+    {
+        return currentVersion;
+    }
+
+    public void setCurrentVersion(String currentVersion)
+    {
+        this.currentVersion = currentVersion;
+    }
+
+    public Integer getMergeParentId()
+    {
+        return mergeParentId;
+    }
+
+    public void setMergeParentId(Integer mergeParentId)
+    {
+        this.mergeParentId = mergeParentId;
+    }
+
+    public String getMergeParentName()
+    {
+        return mergeParentName;
+    }
+
+    public void setMergeParentName(String mergeParentName)
+    {
+        this.mergeParentName = mergeParentName;
     }
 
     public String getMergeInfo()
@@ -254,8 +337,14 @@ public class GameServer extends BaseEntity
             .append("status", getStatus())
             .append("openTime", getOpenTime())
             .append("backendUrl", getBackendUrl())
+            .append("serverAddress", getServerAddress())
+            .append("port", getPort())
+            .append("deployPath", getDeployPath())
             .append("gameDbConfig", getGameDbConfig())
             .append("logDbConfig", getLogDbConfig())
+            .append("currentVersion", getCurrentVersion())
+            .append("mergeParentId", getMergeParentId())
+            .append("mergeParentName", getMergeParentName())
             .append("mergeInfo", getMergeInfo())
             .append("sort", getSort())
             .append("dynamicFields", getDynamicFields())

@@ -46,6 +46,14 @@ public class GameRegion extends BaseEntity
     @Excel(name = "显示顺序")
     private Integer sort;
 
+    /** 服务器ID起始值 */
+    @Excel(name = "服务器ID起始")
+    private Integer serverIdStart;
+
+    /** 服务器ID结束值 */
+    @Excel(name = "服务器ID结束")
+    private Integer serverIdEnd;
+
     /** 动态字段值(JSON) */
     private String dynamicFields;
 
@@ -141,6 +149,26 @@ public class GameRegion extends BaseEntity
     public void setSort(Integer sort)
     {
         this.sort = sort;
+    }
+
+    public Integer getServerIdStart()
+    {
+        return serverIdStart;
+    }
+
+    public void setServerIdStart(Integer serverIdStart)
+    {
+        this.serverIdStart = serverIdStart;
+    }
+
+    public Integer getServerIdEnd()
+    {
+        return serverIdEnd;
+    }
+
+    public void setServerIdEnd(Integer serverIdEnd)
+    {
+        this.serverIdEnd = serverIdEnd;
     }
 
     @JsonIgnore
@@ -252,6 +280,8 @@ public class GameRegion extends BaseEntity
             .append("regionName", getRegionName())
             .append("status", getStatus())
             .append("sort", getSort())
+            .append("serverIdStart", getServerIdStart())
+            .append("serverIdEnd", getServerIdEnd())
             .append("dynamicFields", getDynamicFields())
             .append("servers", getServers())
             .append("proxyRegionKey", getProxyRegionKey())

@@ -89,4 +89,19 @@ public interface GameRegionMapper
      * @return 记录数
      */
     public int countByRegionId(Long regionId);
+
+    /**
+     * 查询与指定范围冲突的分区列表（排除自身）
+     *
+     * @param region 包含 serverIdStart, serverIdEnd, regionId(排除自身)
+     * @return 冲突的分区列表
+     */
+    public List<GameRegion> selectConflictingRegions(GameRegion region);
+
+    /**
+     * 获取所有分区中最大的 server_id_end 值
+     *
+     * @return 最大值
+     */
+    public Integer selectMaxServerIdEnd();
 }

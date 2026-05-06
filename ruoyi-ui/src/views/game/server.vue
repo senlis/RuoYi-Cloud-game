@@ -116,7 +116,14 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
       <el-table-column label="服务器ID" align="center" prop="serverId" :show-overflow-tooltip="true" />
-      <el-table-column label="服务器名称" align="center" prop="serverName" :show-overflow-tooltip="true" />
+      <el-table-column label="服务器名称" align="center" min-width="160">
+        <template slot-scope="scope">
+          <span v-if="scope.row.mergeParentName">{{ scope.row.serverName }} -> {{ scope.row.mergeParentName }}</span>
+          <span v-else>{{ scope.row.serverName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="版本号" align="center" prop="currentVersion" width="100" />
+      <el-table-column label="合服母服" align="center" prop="mergeParentName" :show-overflow-tooltip="true" width="120" />
       <el-table-column label="所属分区" align="center" prop="regionName" :show-overflow-tooltip="true" />
       <el-table-column label="服务器类型" align="center" prop="serverType">
         <template slot-scope="scope">
@@ -133,7 +140,8 @@
           <span>{{ parseTime(scope.row.openTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="后台地址" align="center" prop="backendUrl" :show-overflow-tooltip="true" />
+      <el-table-column label="服务器地址" align="center" prop="serverAddress" :show-overflow-tooltip="true" width="150" />
+      <el-table-column label="端口" align="center" prop="port" width="80" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -211,11 +219,26 @@
         <el-form-item label="后台地址" prop="backendUrl">
           <el-input v-model="form.backendUrl" placeholder="请输入后台地址" />
         </el-form-item>
+        <el-form-item label="服务器地址" prop="serverAddress">
+          <el-input v-model="form.serverAddress" placeholder="请输入服务器地址" />
+        </el-form-item>
+        <el-form-item label="端口" prop="port">
+          <el-input-number v-model="form.port" :min="1" :max="65535" controls-position="right" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="部署路径" prop="deployPath">
+          <el-input v-model="form.deployPath" placeholder="请输入部署路径" />
+        </el-form-item>
         <el-form-item label="游戏库配置" prop="gameDbConfig">
           <el-input v-model="form.gameDbConfig" type="textarea" :rows="3" placeholder="请输入游戏库配置(JSON格式)" />
         </el-form-item>
         <el-form-item label="日志库配置" prop="logDbConfig">
           <el-input v-model="form.logDbConfig" type="textarea" :rows="3" placeholder="请输入日志库配置(JSON格式)" />
+        </el-form-item>
+        <el-form-item label="当前版本" prop="currentVersion">
+          <el-input v-model="form.currentVersion" placeholder="请输入当前版本号" />
+        </el-form-item>
+        <el-form-item label="合服母服ID" prop="mergeParentId">
+          <el-input-number v-model="form.mergeParentId" :min="1" style="width: 100%" placeholder="母服服务器ID（不填则不合并）" />
         </el-form-item>
         <el-form-item label="显示顺序" prop="sort">
           <el-input-number v-model="form.sort" controls-position="right" :min="0" />
@@ -343,8 +366,13 @@ export default {
         status: "0",
         openTime: undefined,
         backendUrl: undefined,
+        serverAddress: undefined,
+        port: undefined,
+        deployPath: undefined,
         gameDbConfig: undefined,
         logDbConfig: undefined,
+        currentVersion: undefined,
+        mergeParentId: undefined,
         sort: undefined,
         remark: undefined,
         dynamicFields: {}

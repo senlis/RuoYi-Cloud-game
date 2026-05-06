@@ -12,11 +12,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="serverType"    column="server_type"    />
         <result property="status"        column="status"         />
         <result property="openTime"      column="open_time"      />
-        <result property="backendUrl"    column="backend_url"    />
-        <result property="gameDbConfig"  column="game_db_config" />
-        <result property="logDbConfig"   column="log_db_config"  />
-        <result property="mergeInfo"     column="merge_info"     />
-        <result property="sort"          column="sort"           />
+        <result property="backendUrl"    column="backend_url"     />
+        <result property="serverAddress" column="server_address"  />
+        <result property="port"          column="port"            />
+        <result property="deployPath"    column="deploy_path"     />
+        <result property="gameDbConfig"  column="game_db_config"  />
+        <result property="logDbConfig"    column="log_db_config"     />
+        <result property="currentVersion" column="current_version"   />
+        <result property="mergeParentId"  column="merge_parent_id"   />
+        <result property="mergeParentName" column="merge_parent_name" />
+        <result property="mergeInfo"      column="merge_info"        />
+        <result property="sort"           column="sort"              />
         <result property="dynamicFields" column="dynamic_fields" />
         <result property="createBy"      column="create_by"      />
         <result property="createTime"    column="create_time"    />
@@ -29,12 +35,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectGameServerVo">
         select s.id, s.server_id, s.region_id,
                s.server_name, s.server_type, s.status,
-               s.open_time, s.backend_url, s.game_db_config, s.log_db_config,
-               s.merge_info, s.sort, s.dynamic_fields,
+               s.open_time, s.backend_url, s.server_address, s.port, s.deploy_path, s.game_db_config, s.log_db_config,
+               s.current_version, s.merge_parent_id, s.merge_info,
+               s.sort, s.dynamic_fields,
                s.create_by, s.create_time, s.update_by, s.update_time, s.remark,
-               r.region_name
+               r.region_name,
+               mp.server_name as merge_parent_name
         from game_server s
         left join game_region r on s.region_id = r.region_id
+        left join game_server mp on s.merge_parent_id = mp.server_id and s.region_id = mp.region_id
     </sql>
 
     <select id="selectGameServerList" parameterType="GameServer" resultMap="GameServerResult">
@@ -95,8 +104,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null and status != ''">status,</if>
             <if test="openTime != null">open_time,</if>
             <if test="backendUrl != null and backendUrl != ''">backend_url,</if>
+            <if test="serverAddress != null and serverAddress != ''">server_address,</if>
+            <if test="port != null">port,</if>
+            <if test="deployPath != null and deployPath != ''">deploy_path,</if>
             <if test="gameDbConfig != null and gameDbConfig != ''">game_db_config,</if>
             <if test="logDbConfig != null and logDbConfig != ''">log_db_config,</if>
+            <if test="currentVersion != null and currentVersion != ''">current_version,</if>
+            <if test="mergeParentId != null">merge_parent_id,</if>
             <if test="mergeInfo != null and mergeInfo != ''">merge_info,</if>
             <if test="sort != null">sort,</if>
             <if test="dynamicFields != null and dynamicFields != ''">dynamic_fields,</if>
@@ -111,8 +125,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null and status != ''">#{status},</if>
             <if test="openTime != null">#{openTime},</if>
             <if test="backendUrl != null and backendUrl != ''">#{backendUrl},</if>
+            <if test="serverAddress != null and serverAddress != ''">#{serverAddress},</if>
+            <if test="port != null">#{port},</if>
+            <if test="deployPath != null and deployPath != ''">#{deployPath},</if>
             <if test="gameDbConfig != null and gameDbConfig != ''">#{gameDbConfig},</if>
             <if test="logDbConfig != null and logDbConfig != ''">#{logDbConfig},</if>
+            <if test="currentVersion != null and currentVersion != ''">#{currentVersion},</if>
+            <if test="mergeParentId != null">#{mergeParentId},</if>
             <if test="mergeInfo != null and mergeInfo != ''">#{mergeInfo},</if>
             <if test="sort != null">#{sort},</if>
             <if test="dynamicFields != null and dynamicFields != ''">#{dynamicFields},</if>
@@ -132,8 +151,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null and status != ''">status = #{status},</if>
             <if test="openTime != null">open_time = #{openTime},</if>
             <if test="backendUrl != null">backend_url = #{backendUrl},</if>
+            <if test="serverAddress != null">server_address = #{serverAddress},</if>
+            <if test="port != null">port = #{port},</if>
+            <if test="deployPath != null">deploy_path = #{deployPath},</if>
             <if test="gameDbConfig != null">game_db_config = #{gameDbConfig},</if>
             <if test="logDbConfig != null">log_db_config = #{logDbConfig},</if>
+            <if test="currentVersion != null">current_version = #{currentVersion},</if>
+            <if test="mergeParentId != null">merge_parent_id = #{mergeParentId},</if>
             <if test="mergeInfo != null">merge_info = #{mergeInfo},</if>
             <if test="sort != null">sort = #{sort},</if>
             <if test="dynamicFields != null">dynamic_fields = #{dynamicFields},</if>

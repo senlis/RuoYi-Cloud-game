@@ -11,9 +11,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="regionCode"    column="region_code"    />
         <result property="regionName"    column="region_name"    />
         <result property="status"        column="status"         />
-        <result property="sort"          column="sort"           />
-        <result property="dynamicFields" column="dynamic_fields" />
-        <result property="servers"       column="servers"       />
+        <result property="sort"          column="sort"             />
+        <result property="serverIdStart" column="server_id_start"   />
+        <result property="serverIdEnd"   column="server_id_end"     />
+        <result property="dynamicFields" column="dynamic_fields"    />
+        <result property="servers"       column="servers"           />
         <result property="proxyRegionKey" column="proxy_region_key" />
         <result property="config"        column="config"        />
         <result property="createBy"      column="create_by"      />
@@ -28,7 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <sql id="selectGameRegionVo">
         select r.region_id, r.channel_id, r.project_id, r.region_code, r.region_name,
-               r.status, r.sort, r.dynamic_fields, r.servers, r.proxy_region_key, r.config,
+               r.status, r.sort, r.server_id_start, r.server_id_end, r.dynamic_fields, r.servers, r.proxy_region_key, r.config,
                r.create_by, r.create_time, r.update_by, r.update_time, r.remark,
                p.project_name, c.channel_name,
                pr.region_name as proxy_region_name
@@ -93,6 +95,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where r.region_code = #{regionCode}
     </select>
 
+    <select id="selectConflictingRegions" parameterType="GameRegion" resultMap="GameRegionResult">
+        <include refid="selectGameRegionVo"/>
+        where r.server_id_start is not null
+          and r.server_id_end is not null
+          and r.server_id_start &lt;= #{serverIdEnd}
+          and r.server_id_end &gt;= #{serverIdStart}
+        <if test="regionId != null">
+          and r.region_id != #{regionId}
+        </if>
+    </select>
+
+    <select id="selectMaxServerIdEnd" resultType="Integer">
+        select max(server_id_end) from game_region
+    </select>
+
     <insert id="insertGameRegion" parameterType="GameRegion">
         insert into game_region (
             <if test="channelId != null">channel_id,</if>
@@ -101,6 +118,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="regionName != null and regionName != ''">region_name,</if>
             <if test="status != null and status != ''">status,</if>
             <if test="sort != null">sort,</if>
+            <if test="serverIdStart != null">server_id_start,</if>
+            <if test="serverIdEnd != null">server_id_end,</if>
             <if test="dynamicFields != null and dynamicFields != ''">dynamic_fields,</if>
             <if test="servers != null and servers != ''">servers,</if>
             <if test="proxyRegionKey != null and proxyRegionKey != ''">proxy_region_key,</if>
@@ -115,6 +134,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="regionName != null and regionName != ''">#{regionName},</if>
             <if test="status != null and status != ''">#{status},</if>
             <if test="sort != null">#{sort},</if>
+            <if test="serverIdStart != null">#{serverIdStart},</if>
+            <if test="serverIdEnd != null">#{serverIdEnd},</if>
             <if test="dynamicFields != null and dynamicFields != ''">#{dynamicFields},</if>
             <if test="servers != null and servers != ''">#{servers},</if>
             <if test="proxyRegionKey != null and proxyRegionKey != ''">#{proxyRegionKey},</if>
@@ -134,6 +155,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="regionName != null and regionName != ''">region_name = #{regionName},</if>
             <if test="status != null and status != ''">status = #{status},</if>
             <if test="sort != null">sort = #{sort},</if>
+            <if test="serverIdStart != null">server_id_start = #{serverIdStart},</if>
+            <if test="serverIdEnd != null">server_id_end = #{serverIdEnd},</if>
             <if test="dynamicFields != null">dynamic_fields = #{dynamicFields},</if>
             <if test="servers != null">servers = #{servers},</if>
             <if test="proxyRegionKey != null">proxy_region_key = #{proxyRegionKey},</if>

@@ -116,6 +116,12 @@
         </template>
       </el-table-column>
       <el-table-column label="显示顺序" align="center" prop="sort" />
+      <el-table-column label="服务器ID范围" align="center" width="160">
+        <template slot-scope="scope">
+          <span v-if="scope.row.serverIdStart && scope.row.serverIdEnd">{{ scope.row.serverIdStart }} ~ {{ scope.row.serverIdEnd }}</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
       <el-table-column label="代理分区" align="center" prop="proxyRegionName" :show-overflow-tooltip="true" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
@@ -208,6 +214,20 @@
         <el-form-item label="分区名称" prop="regionName">
           <el-input v-model="form.regionName" placeholder="请输入分区名称" />
         </el-form-item>
+        <el-form-item label="服务器ID范围">
+          <el-row :gutter="10">
+            <el-col :span="8">
+              <el-input-number v-model="form.serverIdStart" :min="1" style="width: 100%" placeholder="起始ID" />
+            </el-col>
+            <el-col :span="1" style="text-align: center; line-height: 36px;">~</el-col>
+            <el-col :span="8">
+              <el-input-number v-model="form.serverIdEnd" :min="1" style="width: 100%" placeholder="结束ID" />
+            </el-col>
+            <el-col :span="7">
+              <el-button type="primary" plain size="mini" @click="handleGetNextRange">获取可用范围</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
         <el-form-item label="代理分区" prop="proxyRegionKey">
           <el-select v-model="form.proxyRegionKey" placeholder="请选择代理分区（不选则不代理）" clearable style="width: 100%">
             <el-option
@@ -279,7 +299,7 @@
 </template>
 
 <script>
-import { listRegion, getRegion, delRegion, addRegion, updateRegion, listRegionByChannel, exportConfig, cloneRegion } from "@/api/game/region"
+import { listRegion, getRegion, delRegion, addRegion, updateRegion, listRegionByChannel, exportConfig, cloneRegion, getNextRange } from "@/api/game/region"
 import { listProject } from "@/api/game/project"
 import { listChannelByProject } from "@/api/game/channel"
 import { listFieldByEntity } from "@/api/game/fieldDefine"
@@ -437,6 +457,8 @@ export default {
         regionCode: undefined,
         regionName: undefined,
         proxyRegionKey: undefined,
+        serverIdStart: undefined,
+        serverIdEnd: undefined,
         status: "0",
         sort: undefined,
         remark: undefined,
@@ -444,6 +466,17 @@ export default {
       }
       this.channelOptions = []
       this.resetForm("form")
+    },
+    /** 获取下一个可用服务器ID范围 */
+    handleGetNextRange() {
+      getNextRange().then(response => {
+        const data = response.data
+        if (data) {
+          this.form.serverIdStart = data.serverIdStart
+          this.form.serverIdEnd = data.serverIdEnd
+          this.$modal.msgSuccess("已获取可用范围: " + data.serverIdStart + " ~ " + data.serverIdEnd)
+        }
+      })
     },
     /** 搜索按钮操作 */
     handleQuery() {

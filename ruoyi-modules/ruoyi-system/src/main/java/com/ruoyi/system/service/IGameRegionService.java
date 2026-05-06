@@ -67,6 +67,21 @@ public interface IGameRegionService
     public boolean checkRegionCodeUnique(GameRegion region);
 
     /**
+     * 校验服务器ID范围是否与其他分区冲突
+     *
+     * @param region 包含 serverIdStart/serverIdEnd/regionId
+     * @return 冲突分区列表，无冲突返回空列表
+     */
+    public List<GameRegion> checkServerIdRangeConflict(GameRegion region);
+
+    /**
+     * 获取下一个可用的服务器ID范围（默认10000大小）
+     *
+     * @return 包含 serverIdStart 和 serverIdEnd
+     */
+    public GameRegion getNextAvailableRange();
+
+    /**
      * 生成并存储导出配置JSON
      *
      * @param regionId 分区ID

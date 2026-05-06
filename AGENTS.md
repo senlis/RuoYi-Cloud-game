@@ -179,6 +179,7 @@ SQL 初始化脚本在 `sql/` 目录：`ry_20260417.sql`（主库表结构）、
 
 ORM 使用 MyBatis + XML 映射文件，分页通过 PageHelper 实现。
 
+后续新增的sql脚本都放在 `sql/` 目录
 ### 前端结构
 
 - API 调用：`src/api/`（按模块组织：system、monitor、tool）

@@ -112,6 +112,7 @@ public class GameRegionServiceImpl implements IGameRegionService
 
     /**
      * 新增游戏分区
+     * 未指定 serverIdStart 时自动分配一个10000大小的可用范围
      *
      * @param region 游戏分区信息
      * @return 结果
@@ -119,11 +120,25 @@ public class GameRegionServiceImpl implements IGameRegionService
     @Override
     public int insertGameRegion(GameRegion region)
     {
+        if (region.getServerIdStart() == null || region.getServerIdEnd() == null)
+        {
+            GameRegion range = getNextAvailableRange();
+            region.setServerIdStart(range.getServerIdStart());
+            region.setServerIdEnd(range.getServerIdEnd());
+        }
+        // 检查范围冲突
+        List<GameRegion> conflicts = checkServerIdRangeConflict(region);
+        if (!conflicts.isEmpty())
+        {
+            throw new com.ruoyi.common.core.exception.ServiceException(
+                    "服务器ID范围与分区【" + conflicts.get(0).getRegionName() + "】冲突");
+        }
         return gameRegionMapper.insertGameRegion(region);
     }
 
     /**
      * 修改游戏分区
+     * 修改服务器ID范围时检查冲突
      *
      * @param region 游戏分区信息
      * @return 结果
@@ -131,7 +146,67 @@ public class GameRegionServiceImpl implements IGameRegionService
     @Override
     public int updateGameRegion(GameRegion region)
     {
+        // 只在该次修改涉及范围时才检查冲突
+        if (region.getServerIdStart() != null || region.getServerIdEnd() != null)
+        {
+            GameRegion full = region.getRegionId() != null
+                    ? gameRegionMapper.selectGameRegionById(region.getRegionId()) : null;
+            Integer start = region.getServerIdStart() != null ? region.getServerIdStart()
+                    : (full != null ? full.getServerIdStart() : null);
+            Integer end = region.getServerIdEnd() != null ? region.getServerIdEnd()
+                    : (full != null ? full.getServerIdEnd() : null);
+            if (start != null && end != null)
+            {
+                GameRegion check = new GameRegion();
+                check.setServerIdStart(start);
+                check.setServerIdEnd(end);
+                check.setRegionId(region.getRegionId());
+                List<GameRegion> conflicts = checkServerIdRangeConflict(check);
+                if (!conflicts.isEmpty())
+                {
+                    throw new com.ruoyi.common.core.exception.ServiceException(
+                            "服务器ID范围与分区【" + conflicts.get(0).getRegionName() + "】冲突");
+                }
+            }
+        }
         return gameRegionMapper.updateGameRegion(region);
+    }
+
+    /**
+     * 校验服务器ID范围是否与其他分区冲突
+     *
+     * @param region 包含 serverIdStart/serverIdEnd/regionId(自身，用于排除)
+     * @return 冲突分区列表
+     */
+    @Override
+    public List<GameRegion> checkServerIdRangeConflict(GameRegion region)
+    {
+        if (region.getServerIdStart() == null || region.getServerIdEnd() == null)
+        {
+            return java.util.Collections.emptyList();
+        }
+        return gameRegionMapper.selectConflictingRegions(region);
+    }
+
+    /**
+     * 获取下一个可用的服务器ID范围（10000大小）
+     */
+    @Override
+    public GameRegion getNextAvailableRange()
+    {
+        GameRegion range = new GameRegion();
+        Integer maxEnd = gameRegionMapper.selectMaxServerIdEnd();
+        if (maxEnd == null)
+        {
+            range.setServerIdStart(1);
+            range.setServerIdEnd(10000);
+        }
+        else
+        {
+            range.setServerIdStart(maxEnd + 1);
+            range.setServerIdEnd(maxEnd + 10000);
+        }
+        return range;
     }
 
     /**

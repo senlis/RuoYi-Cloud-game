@@ -59,6 +59,14 @@ export function exportConfig(regionId) {
   })
 }
 
+// 获取下一个可用服务器ID范围
+export function getNextRange() {
+  return request({
+    url: '/system/game/region/nextRange',
+    method: 'get'
+  })
+}
+
 // 获取分区config（region级别导出配置）
 export function getRegionConfig(regionId) {
   return request({
