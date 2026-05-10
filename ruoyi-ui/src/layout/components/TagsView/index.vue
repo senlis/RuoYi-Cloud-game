@@ -221,9 +221,24 @@ export default {
     },
     addTags() {
       const { name } = this.$route
-      if (name) {
-        this.$store.dispatch('tagsView/addView', this.$route)
+      // 优先用路由name；如果路由name为空（后端菜单未配routeName），
+      // 则用组件自身的name，确保keep-alive能正确匹配缓存
+      const routeName = name || this.getComponentName()
+      if (routeName) {
+        this.$store.dispatch('tagsView/addView', { ...this.$route, name: routeName })
       }
+    },
+    /** 获取当前路由匹配到的第一个非Layout组件的实际name */
+    getComponentName() {
+      const matched = this.$route.matched
+      for (const record of matched) {
+        if (record.components && record.components.default && record.components.default.name) {
+          if (!['Layout', 'ParentView'].includes(record.components.default.name)) {
+            return record.components.default.name
+          }
+        }
+      }
+      return null
     },
     moveToCurrentTag() {
       const tags = this.$refs.tag

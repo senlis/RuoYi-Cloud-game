@@ -51,7 +51,13 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-security</artifactId>
         </dependency>
-        
+
+        <!-- RuoYi API System（Feign 远程调用） -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-api-system</artifactId>
+        </dependency>
+
     </dependencies>
 	
     <build>

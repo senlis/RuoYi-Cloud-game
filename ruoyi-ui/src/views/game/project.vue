@@ -156,6 +156,8 @@
           v-model="form.dynamicFields"
           formType="form"
         />
+        <!-- ClickHouse 配置 -->
+        <ClickHouseConfig v-model="form.clickhouseConfig" />
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -169,11 +171,12 @@
 import { listProject, getProject, delProject, addProject, updateProject } from "@/api/game/project"
 import { listFieldByEntity } from "@/api/game/fieldDefine"
 import DynamicFields from "@/components/game/DynamicFields"
+import ClickHouseConfig from "@/components/game/ClickHouseConfig"
 
 export default {
   name: "GameProject",
   dicts: ['sys_normal_disable'],
-  components: { DynamicFields },
+  components: { DynamicFields, ClickHouseConfig },
   data() {
     return {
       // 遮罩层
@@ -252,7 +255,8 @@ export default {
         status: "0",
         sort: undefined,
         remark: undefined,
-        dynamicFields: {}
+        dynamicFields: {},
+        clickhouseConfig: {}
       }
       this.resetForm("form")
     },

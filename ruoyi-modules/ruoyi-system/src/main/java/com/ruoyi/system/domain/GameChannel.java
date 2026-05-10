@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.alibaba.fastjson2.JSON;
 import com.ruoyi.common.core.web.domain.BaseEntity;
+import java.util.Date;
 
 /**
  * 游戏渠道对象 game_channel
@@ -60,6 +61,18 @@ public class GameChannel extends BaseEntity
     /** 项目名称(用于列表显示) */
     @Excel(name = "所属项目名称")
     private String projectName;
+
+    /** SecureKey SHA-256 哈希 */
+    private String secureKeyHash;
+
+    /** SecureKey 盐值 */
+    private String secureKeySalt;
+
+    /** SecureKey 版本号(轮换时递增) */
+    private Integer secureKeyVersion;
+
+    /** SecureKey 最近更新时间 */
+    private Date secureKeyUpdatedAt;
 
     public Long getChannelId()
     {
@@ -202,6 +215,46 @@ public class GameChannel extends BaseEntity
         this.projectName = projectName;
     }
 
+    public String getSecureKeyHash()
+    {
+        return secureKeyHash;
+    }
+
+    public void setSecureKeyHash(String secureKeyHash)
+    {
+        this.secureKeyHash = secureKeyHash;
+    }
+
+    public String getSecureKeySalt()
+    {
+        return secureKeySalt;
+    }
+
+    public void setSecureKeySalt(String secureKeySalt)
+    {
+        this.secureKeySalt = secureKeySalt;
+    }
+
+    public Integer getSecureKeyVersion()
+    {
+        return secureKeyVersion;
+    }
+
+    public void setSecureKeyVersion(Integer secureKeyVersion)
+    {
+        this.secureKeyVersion = secureKeyVersion;
+    }
+
+    public Date getSecureKeyUpdatedAt()
+    {
+        return secureKeyUpdatedAt;
+    }
+
+    public void setSecureKeyUpdatedAt(Date secureKeyUpdatedAt)
+    {
+        this.secureKeyUpdatedAt = secureKeyUpdatedAt;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -216,6 +269,9 @@ public class GameChannel extends BaseEntity
             .append("sort", getSort())
             .append("dynamicFields", getDynamicFields())
             .append("projectName", getProjectName())
+            .append("secureKeyHash", getSecureKeyHash())
+            .append("secureKeyVersion", getSecureKeyVersion())
+            .append("secureKeyUpdatedAt", getSecureKeyUpdatedAt())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

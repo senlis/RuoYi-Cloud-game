@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gserve.mapper.GameProjectChConfigMapper">
+
+    <resultMap type="com.ruoyi.gserve.domain.GameProjectChConfig" id="ChConfigResult">
+        <result property="projectId"        column="project_id" />
+        <result property="clickhouseConfig" column="clickhouse_config" />
+    </resultMap>
+
+    <select id="selectById" parameterType="Long" resultMap="ChConfigResult">
+        select project_id, clickhouse_config
+        from game_project
+        where project_id = #{projectId}
+    </select>
+
+</mapper>

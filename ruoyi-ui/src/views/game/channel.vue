@@ -220,6 +220,8 @@
           v-model="form.dynamicFields"
           formType="form"
         />
+        <!-- SecureKey 管理（仅编辑模式展示） -->
+        <SecureKeyManager v-if="form.channelId" :channelId="form.channelId" />
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -234,11 +236,12 @@ import { listChannel, getChannel, delChannel, addChannel, updateChannel } from "
 import { listProject } from "@/api/game/project"
 import { listFieldByEntity } from "@/api/game/fieldDefine"
 import DynamicFields from "@/components/game/DynamicFields"
+import SecureKeyManager from "@/components/game/SecureKeyManager"
 
 export default {
   name: "GameChannel",
   dicts: ['sys_normal_disable', 'game_channel_type'],
-  components: { DynamicFields },
+  components: { DynamicFields, SecureKeyManager },
   data() {
     return {
       // 遮罩层

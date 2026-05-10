@@ -18,10 +18,17 @@ import com.ruoyi.common.core.web.domain.AjaxResult;
 import com.ruoyi.common.core.web.page.TableDataInfo;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.security.annotation.InnerAuth;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.common.security.utils.SecurityUtils;
 import com.ruoyi.system.domain.GameChannel;
+import com.ruoyi.system.domain.GameProject;
+import com.ruoyi.system.mapper.GameProjectMapper;
 import com.ruoyi.system.service.IGameChannelService;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 游戏渠道 信息操作处理
@@ -34,6 +41,9 @@ public class GameChannelController extends BaseController
 {
     @Autowired
     private IGameChannelService gameChannelService;
+
+    @Autowired
+    private GameProjectMapper gameProjectMapper;
 
     /**
      * 查询游戏渠道列表
@@ -121,5 +131,70 @@ public class GameChannelController extends BaseController
         List<GameChannel> list = gameChannelService.selectGameChannelList(channel);
         ExcelUtil<GameChannel> util = new ExcelUtil<>(GameChannel.class);
         util.exportExcel(response, list, "游戏渠道数据");
+    }
+
+    // ==================== 供 Auth 模块 Feign 调用的内部接口 ====================
+
+    /**
+     * 查询渠道 SecureKey 相关信息（内部 Feign 调用）
+     */
+    @InnerAuth
+    @GetMapping("/secure-info/{channelId}")
+    public AjaxResult getChannelSecureInfo(@PathVariable Long channelId) {
+        GameChannel channel = gameChannelService.selectGameChannelById(channelId);
+        if (channel == null) {
+            return error("渠道不存在: " + channelId);
+        }
+
+        GameProject project = gameProjectMapper.selectGameProjectById(channel.getProjectId());
+
+        Map<String, Object> info = new HashMap<>();
+        info.put("channelId", channel.getChannelId());
+        info.put("channelCode", channel.getChannelCode());
+        info.put("projectId", channel.getProjectId());
+        info.put("secureKeyHash", channel.getSecureKeyHash());
+        info.put("secureKeySalt", channel.getSecureKeySalt());
+        info.put("secureKeyVersion", channel.getSecureKeyVersion());
+        info.put("secureKeyUpdatedAt", channel.getSecureKeyUpdatedAt());
+        info.put("clickhouseConfig", project != null ? project.getClickhouseConfig() : null);
+
+        return success(info);
+    }
+
+    /**
+     * 更新渠道 SecureKey 字段（内部 Feign 调用）
+     */
+    @InnerAuth
+    @PutMapping("/secure-key/{channelId}")
+    public AjaxResult updateChannelSecureKey(@PathVariable Long channelId,
+                                              @RequestBody Map<String, Object> data) {
+        GameChannel channel = gameChannelService.selectGameChannelById(channelId);
+        if (channel == null) {
+            return error("渠道不存在: " + channelId);
+        }
+
+        if (data.containsKey("secureKeyHash")) {
+            channel.setSecureKeyHash((String) data.get("secureKeyHash"));
+        }
+        if (data.containsKey("secureKeySalt")) {
+            channel.setSecureKeySalt((String) data.get("secureKeySalt"));
+        }
+        if (data.containsKey("secureKeyVersion")) {
+            Object ver = data.get("secureKeyVersion");
+            channel.setSecureKeyVersion(ver instanceof Integer ? (Integer) ver
+                    : Integer.parseInt(String.valueOf(ver)));
+        }
+        if (data.containsKey("secureKeyUpdatedAt")) {
+            Object dt = data.get("secureKeyUpdatedAt");
+            if (dt instanceof java.util.Date) {
+                channel.setSecureKeyUpdatedAt((java.util.Date) dt);
+            } else {
+                // Feign JSON 序列化后 Date 变成 String，直接设为当前时间
+                channel.setSecureKeyUpdatedAt(new java.util.Date());
+            }
+        }
+
+        gameChannelService.updateGameChannel(channel);
+        return success();
     }
 }

@@ -50,3 +50,27 @@ export function delChannel(channelId) {
     method: 'delete'
   })
 }
+
+// 获取 SecureKey 信息
+export function getSecureKeyInfo(channelId) {
+  return request({
+    url: '/auth/securekey/channel/' + channelId + '/info',
+    method: 'get'
+  })
+}
+
+// 生成 SecureKey
+export function generateSecureKey(channelId) {
+  return request({
+    url: '/auth/securekey/channel/' + channelId + '/generate',
+    method: 'post'
+  })
+}
+
+// 重置 SecureKey
+export function resetSecureKey(channelId) {
+  return request({
+    url: '/auth/securekey/channel/' + channelId + '/reset',
+    method: 'put'
+  })
+}

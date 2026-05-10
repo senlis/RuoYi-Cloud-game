@@ -42,6 +42,9 @@ public class GameProject extends BaseEntity
     /** 动态字段值(JSON) */
     private String dynamicFields;
 
+    /** ClickHouse 连接配置(JSON) — 在项目管理页面配置 */
+    private String clickhouseConfig;
+
     @JsonIgnore
     public String getDynamicFields()
     {
@@ -62,6 +65,46 @@ public class GameProject extends BaseEntity
         catch (Exception e)
         {
             return dynamicFields;
+        }
+    }
+
+    @JsonIgnore
+    public String getClickhouseConfig()
+    {
+        return clickhouseConfig;
+    }
+
+    @JsonProperty("clickhouseConfig")
+    public Object getClickhouseConfigObj()
+    {
+        if (clickhouseConfig == null || clickhouseConfig.isEmpty())
+        {
+            return new java.util.HashMap<String, Object>();
+        }
+        try
+        {
+            return JSON.parseObject(clickhouseConfig);
+        }
+        catch (Exception e)
+        {
+            return clickhouseConfig;
+        }
+    }
+
+    @JsonProperty("clickhouseConfig")
+    public void setClickhouseConfig(Object clickhouseConfig)
+    {
+        if (clickhouseConfig == null)
+        {
+            this.clickhouseConfig = null;
+        }
+        else if (clickhouseConfig instanceof String)
+        {
+            this.clickhouseConfig = (String) clickhouseConfig;
+        }
+        else
+        {
+            this.clickhouseConfig = JSON.toJSONString(clickhouseConfig);
         }
     }
 
@@ -142,6 +185,7 @@ public class GameProject extends BaseEntity
             .append("status", getStatus())
             .append("sort", getSort())
             .append("dynamicFields", getDynamicFields())
+            .append("clickhouseConfig", getClickhouseConfig())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

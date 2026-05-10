@@ -42,3 +42,12 @@ export function delProject(projectId) {
     method: 'delete'
   })
 }
+
+// 测试 ClickHouse 连接
+export function testClickHouseConnection(config) {
+  return request({
+    url: '/system/game/project/test-clickhouse',
+    method: 'post',
+    data: config
+  })
+}

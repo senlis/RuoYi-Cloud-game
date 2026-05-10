@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.core.utils.poi.ExcelUtil;
+import java.util.Map;
+import com.alibaba.fastjson2.JSON;
 import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.web.domain.AjaxResult;
 import com.ruoyi.common.core.web.page.TableDataInfo;
@@ -121,5 +123,45 @@ public class GameProjectController extends BaseController
         List<GameProject> list = gameProjectService.selectGameProjectList(project);
         ExcelUtil<GameProject> util = new ExcelUtil<>(GameProject.class);
         util.exportExcel(response, list, "游戏项目数据");
+    }
+
+    /**
+     * 测试 ClickHouse 连接
+     */
+    @RequiresPermissions("game:project:edit")
+    @PostMapping("/test-clickhouse")
+    public AjaxResult testClickHouse(@RequestBody Map<String, Object> config)
+    {
+        try
+        {
+            String host = (String) config.get("host");
+            int port = Integer.parseInt(String.valueOf(config.get("port")));
+            String database = (String) config.get("database");
+            String username = (String) config.get("username");
+            String password = (String) config.getOrDefault("password", "");
+
+            String url = String.format("jdbc:clickhouse://%s:%d/%s", host, port, database);
+            java.util.Properties props = new java.util.Properties();
+            props.setProperty("user", username != null ? username : "default");
+            props.setProperty("password", password);
+            props.setProperty("connectTimeout", "5000");
+            props.setProperty("compress", "0");
+
+            try (java.sql.Connection conn = new com.clickhouse.jdbc.ClickHouseDataSource(url, props).getConnection())
+            {
+                if (conn.isValid(3))
+                {
+                    return success("连接成功");
+                }
+                else
+                {
+                    return error("连接失败：无法建立连接");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            return error("连接失败：" + e.getMessage());
+        }
     }
 }

@@ -142,11 +142,6 @@ ruoyi-auth（依赖 common-security）
 
 ## 关键模式与约定
 
-### 应用启动注解
-
-每个服务的 Application 类均标注：
-- `@EnableCustomConfig` -- 组合注解：启用 AOP 代理暴露、`@MapperScan("com.ruoyi.**.mapper")`、异步执行，并导入 `ApplicationConfig` + `FeignAutoConfiguration`
-- `@EnableRyFeignClients` -- 启用 Feign，扫描基础包 `com.ruoyi`
 
 ### Nacos 配置管理
 

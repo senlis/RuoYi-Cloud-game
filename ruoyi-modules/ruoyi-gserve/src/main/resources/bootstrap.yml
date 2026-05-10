@@ -1,0 +1,32 @@
+# gserve 数据接收服务 Nacos 配置
+
+# Tomcat
+server:
+  port: 9400
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: ruoyi-gserve
+  profiles:
+    # 环境配置
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 192.168.11.106:8848
+      config:
+        # 配置中心地址
+        server-addr: 192.168.11.106:8848
+
+  config:
+    file-extension: yml
+    import:
+      - optional:nacos:application-${spring.profiles.active}.${spring.config.file-extension}
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.${spring.config.file-extension}
+
+logging:
+  level:
+    com.alibaba.nacos.client.config.impl: WARN

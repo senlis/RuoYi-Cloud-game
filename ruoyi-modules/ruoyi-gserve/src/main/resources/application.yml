@@ -1,0 +1,2 @@
+# gserve 配置全部使用 Nacos (ruoyi-gserve-dev.yml + application-dev.yml)
+# 此文件为空，避免与 Nacos 配置冲突

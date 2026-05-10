@@ -71,6 +71,18 @@
             <artifactId>ruoyi-common-swagger</artifactId>
         </dependency>
 
+        <!-- RuoYi Common Redis（用于 ClickHouse 配置缓存） -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-redis</artifactId>
+        </dependency>
+
+        <!-- ClickHouse JDBC 驱动 -->
+        <dependency>
+            <groupId>com.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
+            <version>0.6.5</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -33,13 +33,19 @@
         <minio.version>8.2.2</minio.version>
         <poi.version>4.1.2</poi.version>
         <springdoc.version>3.0.2</springdoc.version>
+        <lz4.version>1.8.0</lz4.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
     </properties>
 
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
-
+            <!-- LZ4 压缩库（ClickHouse HTTP 协议默认使用 LZ4） -->
+<!--            <dependency>-->
+<!--                <groupId>org.lz4</groupId>-->
+<!--                <artifactId>lz4-java</artifactId>-->
+<!--                <version>${lz4.version}</version>-->
+<!--            </dependency>-->
             <!-- SpringCloud 微服务 -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>

@@ -15,6 +15,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="contactPhone"  column="contact_phone"  />
         <result property="sort"          column="sort"           />
         <result property="dynamicFields" column="dynamic_fields" />
+        <result property="secureKeyHash"      column="secure_key_hash" />
+        <result property="secureKeySalt"      column="secure_key_salt" />
+        <result property="secureKeyVersion"   column="secure_key_version" />
+        <result property="secureKeyUpdatedAt" column="secure_key_updated_at" />
         <result property="createBy"      column="create_by"      />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"      column="update_by"      />
@@ -26,6 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectGameChannelVo">
         select c.channel_id, c.project_id, c.channel_code, c.channel_name, c.channel_type,
                c.status, c.contact_person, c.contact_phone, c.sort, c.dynamic_fields,
+               c.secure_key_hash, c.secure_key_salt, c.secure_key_version, c.secure_key_updated_at,
                c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
                p.project_name
         from game_channel c
@@ -124,6 +129,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
             <if test="sort != null">sort = #{sort},</if>
             <if test="dynamicFields != null">dynamic_fields = #{dynamicFields},</if>
+            <if test="secureKeyHash != null">secure_key_hash = #{secureKeyHash},</if>
+            <if test="secureKeySalt != null">secure_key_salt = #{secureKeySalt},</if>
+            <if test="secureKeyVersion != null">secure_key_version = #{secureKeyVersion},</if>
+            <if test="secureKeyUpdatedAt != null">secure_key_updated_at = #{secureKeyUpdatedAt},</if>
             <if test="remark != null">remark = #{remark},</if>
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
             update_time = sysdate()
