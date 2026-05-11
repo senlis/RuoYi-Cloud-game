@@ -39,8 +39,7 @@ public class EventReceiveController {
      * <p>
      * 请求头（由 Gateway GserveAuthFilter 注入）：
      * - X-App-Id: 渠道 AppId
-     * - X-Project-Id: 项目 ID（用于 ClickHouse 路由）
-     * - X-ClickHouse-Config: 项目 ClickHouse 配置 JSON（由 Gateway 从 Redis 注入）
+     * - X-Project-Id: 项目 ID（用于 ClickHouse 路由，由 Gateway 解析 secureKey 注入）
      */
     @PostMapping("/receive")
     public R<Map<String, Object>> receive(@Valid @RequestBody EventBatchDTO batch,
@@ -50,7 +49,7 @@ public class EventReceiveController {
             appId = batch.getAppId();
         }
 
-        // 从请求头获取项目信息
+        // 从请求头获取项目信息（由 Gateway 注入）
         String projectIdStr = request.getHeader("X-Project-Id");
         Long projectId = null;
         if (StringUtils.isNotBlank(projectIdStr)) {
@@ -61,18 +60,15 @@ public class EventReceiveController {
             }
         }
 
-        // ClickHouse 配置 JSON（由 Gateway 从 Redis 读取后注入）
-        String configJson = request.getHeader("X-ClickHouse-Config");
-
-        if (projectId == null || StringUtils.isBlank(configJson)) {
-            return R.fail("未指定项目 ID 或 ClickHouse 配置");
+        if (projectId == null) {
+            return R.fail("未指定项目 ID");
         }
 
         log.info("接收到事件上报: table={}, appId={}, projectId={}, events={}",
                 batch.getTable(), appId, projectId,
                 batch.getEvents() != null ? batch.getEvents().size() : 0);
 
-        return eventReceiveService.receive(batch, appId, projectId, configJson);
+        return eventReceiveService.receive(batch, appId, projectId);
     }
 
     /**
@@ -81,5 +77,28 @@ public class EventReceiveController {
     @GetMapping("/health")
     public R<String> health() {
         return R.ok("gserve is running");
+    }
+
+    /**
+     * 异步队列状态（仅 async 策略时有效）
+     */
+    @GetMapping("/queue/stats")
+    public R<Map<String, Object>> queueStats() {
+        Map<String, Object> info = new java.util.LinkedHashMap<>();
+        info.put("strategy", eventReceiveService.getStrategyName());
+        Object queue = eventReceiveService.getAsyncQueueStats();
+        if (queue != null) {
+            info.put("queue", queue);
+        }
+        return R.ok(info);
+    }
+
+    /**
+     * 手动触发队列刷新（仅 async 策略时有效）
+     */
+    @PostMapping("/queue/flush")
+    public R<String> queueFlush() {
+        eventReceiveService.flushAsyncQueue();
+        return R.ok("flush triggered");
     }
 }

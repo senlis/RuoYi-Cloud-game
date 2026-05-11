@@ -27,6 +27,12 @@ public class GserveConfig {
     /** 错误日志配置 */
     private ErrorLogConfig errorLog = new ErrorLogConfig();
 
+    /** 写入策略: direct / async / mq（默认直写） */
+    private String writeStrategy = "direct";
+
+    /** 异步队列配置 */
+    private AsyncQueueConfig asyncQueue = new AsyncQueueConfig();
+
     public int getMaxBatchSize() {
         return maxBatchSize;
     }
@@ -67,6 +73,12 @@ public class GserveConfig {
         this.errorLog = errorLog;
     }
 
+    public String getWriteStrategy() { return writeStrategy; }
+    public void setWriteStrategy(String writeStrategy) { this.writeStrategy = writeStrategy; }
+
+    public AsyncQueueConfig getAsyncQueue() { return asyncQueue; }
+    public void setAsyncQueue(AsyncQueueConfig asyncQueue) { this.asyncQueue = asyncQueue; }
+
     public static class RetryConfig {
         private int maxRetries = 3;
         private long retryIntervalMs = 1000;
@@ -85,5 +97,22 @@ public class GserveConfig {
         public void setEnabled(boolean enabled) { this.enabled = enabled; }
         public int getMaxRetentionDays() { return maxRetentionDays; }
         public void setMaxRetentionDays(int maxRetentionDays) { this.maxRetentionDays = maxRetentionDays; }
+    }
+
+    /** 异步队列配置 */
+    public static class AsyncQueueConfig {
+        /** 队列容量 */
+        private int capacity = 50000;
+        /** 定时刷新间隔(ms) */
+        private long flushIntervalMs = 3000;
+        /** 单次最大批量写入行数 */
+        private int flushBatchSize = 5000;
+
+        public int getCapacity() { return capacity; }
+        public void setCapacity(int capacity) { this.capacity = capacity; }
+        public long getFlushIntervalMs() { return flushIntervalMs; }
+        public void setFlushIntervalMs(long flushIntervalMs) { this.flushIntervalMs = flushIntervalMs; }
+        public int getFlushBatchSize() { return flushBatchSize; }
+        public void setFlushBatchSize(int flushBatchSize) { this.flushBatchSize = flushBatchSize; }
     }
 }

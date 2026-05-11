@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: ruoyi-gserve
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+  config:
+    import: []

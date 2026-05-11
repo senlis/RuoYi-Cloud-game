@@ -1,0 +1,17 @@
+# 测试配置 — 使用 async 策略避免依赖真实 ClickHouse
+game:
+  analytics:
+    etl:
+      write-strategy: async
+      async-queue:
+        capacity: 50000
+        flush-interval-ms: 10000
+        flush-batch-size: 5000
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - com.alibaba.druid.spring.boot4.autoconfigure.DruidDataSourceAutoConfigure

@@ -36,12 +36,11 @@ public class ClickHouseWriterService {
      * 批量写入数据
      *
      * @param projectId    项目 ID（用于路由 ClickHouse）
-     * @param configJson   项目 ClickHouse 配置 JSON
      * @param tableName    目标表名
      * @param columns      列名列表
      * @param rows         数据行
      */
-    public int batchWrite(long projectId, String configJson, String tableName,
+    public int batchWrite(long projectId, String tableName,
                           List<String> columns, List<Map<String, Object>> rows) {
         if (rows == null || rows.isEmpty()) {
             return 0;
@@ -60,7 +59,7 @@ public class ClickHouseWriterService {
 
             for (int attempt = 0; attempt <= retries; attempt++) {
                 try {
-                    int n = doWrite(projectId, configJson, tableName, columns, batch);
+                    int n = doWrite(projectId, tableName, columns, batch);
                     totalWritten += n;
                     success = true;
                     break;
@@ -93,7 +92,7 @@ public class ClickHouseWriterService {
     /**
      * 执行单次批量写入
      */
-    private int doWrite(long projectId, String configJson, String tableName,
+    private int doWrite(long projectId, String tableName,
                         List<String> columns, List<Map<String, Object>> rows) throws Exception {
 
         // 构建占位符 SQL
@@ -116,7 +115,7 @@ public class ClickHouseWriterService {
             sql.append(placeholders);
         }
 
-        try (Connection conn = clickHouseConfig.getConnection(projectId, configJson);
+        try (Connection conn = clickHouseConfig.getConnection(projectId);
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
             int idx = 1;
