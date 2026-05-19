@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bridge.mapper.BrChannelConfigMapper">
+
+    <resultMap type="BrChannelConfig" id="BrChannelConfigResult">
+        <result property="channelId"      column="channel_id"       />
+        <result property="channelKey"     column="channel_key"      />
+        <result property="channelName"    column="channel_name"     />
+        <result property="channelBase"    column="channel_base"     />
+        <result property="publishPlatform" column="publish_platform"/>
+        <result property="appId"          column="app_id"           />
+        <result property="appKey"         column="app_key"          />
+        <result property="cpId"           column="cp_id"            />
+        <result property="cpAppId"        column="cp_app_id"        />
+        <result property="payPublicKey"   column="pay_public_key"   />
+        <result property="payPrivateKey"  column="pay_private_key"  />
+        <result property="authUrl"        column="auth_url"         />
+        <result property="packageParams"  column="package_params"   />
+        <result property="sort"           column="sort"             />
+        <result property="status"         column="status"           />
+        <result property="remark"         column="remark"           />
+        <result property="createTime"     column="create_time"      />
+        <result property="updateTime"     column="update_time"      />
+    </resultMap>
+
+    <sql id="selectVo">
+        select channel_id, channel_key, channel_name, channel_base, publish_platform,
+               app_id, app_key, cp_id, cp_app_id, pay_public_key, pay_private_key,
+               auth_url, package_params, sort, status, remark, create_time, update_time
+        from br_channel_config
+    </sql>
+
+    <select id="selectByChannelId" parameterType="Long" resultMap="BrChannelConfigResult">
+        <include refid="selectVo"/> where channel_id = #{channelId}
+    </select>
+    <select id="selectByChannelKey" parameterType="String" resultMap="BrChannelConfigResult">
+        <include refid="selectVo"/> where channel_key = #{channelKey}
+    </select>
+    <select id="selectList" parameterType="BrChannelConfig" resultMap="BrChannelConfigResult">
+        <include refid="selectVo"/>
+        <where>
+            <if test="channelKey != null and channelKey != ''">AND channel_key = #{channelKey}</if>
+            <if test="channelName != null and channelName != ''">AND channel_name LIKE CONCAT('%', #{channelName}, '%')</if>
+            <if test="channelBase != null and channelBase != ''">AND channel_base = #{channelBase}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        order by sort asc, channel_id asc
+    </select>
+
+    <insert id="insert" parameterType="BrChannelConfig" useGeneratedKeys="true" keyProperty="channelId">
+        insert into br_channel_config (
+            channel_key, channel_name, channel_base, publish_platform,
+            app_id, app_key, cp_id, cp_app_id,
+            pay_public_key, pay_private_key, auth_url, package_params,
+            sort, status, remark
+        ) values (
+            #{channelKey}, #{channelName}, #{channelBase}, #{publishPlatform},
+            #{appId}, #{appKey}, #{cpId}, #{cpAppId},
+            #{payPublicKey}, #{payPrivateKey}, #{authUrl}, #{packageParams},
+            #{sort}, #{status}, #{remark}
+        )
+    </insert>
+
+    <update id="update" parameterType="BrChannelConfig">
+        update br_channel_config
+        <set>
+            <if test="channelName != null">channel_name = #{channelName},</if>
+            <if test="channelBase != null">channel_base = #{channelBase},</if>
+            <if test="publishPlatform != null">publish_platform = #{publishPlatform},</if>
+            <if test="appId != null">app_id = #{appId},</if>
+            <if test="appKey != null">app_key = #{appKey},</if>
+            <if test="cpId != null">cp_id = #{cpId},</if>
+            <if test="cpAppId != null">cp_app_id = #{cpAppId},</if>
+            <if test="payPublicKey != null">pay_public_key = #{payPublicKey},</if>
+            <if test="payPrivateKey != null">pay_private_key = #{payPrivateKey},</if>
+            <if test="authUrl != null">auth_url = #{authUrl},</if>
+            <if test="packageParams != null">package_params = #{packageParams},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where channel_id = #{channelId}
+    </update>
+
+    <delete id="deleteByIds" parameterType="Long">
+        delete from br_channel_config where channel_id in
+        <foreach item="channelId" collection="array" open="(" separator="," close=")">#{channelId}</foreach>
+    </delete>
+</mapper>

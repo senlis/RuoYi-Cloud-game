@@ -1,0 +1,22 @@
+server:
+  port: 9500
+
+spring:
+  application:
+    name: ruoyi-bridge
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.11.106:8848
+      config:
+        server-addr: 192.168.11.106:8848
+  config:
+    file-extension: yml
+    import:
+      - optional:nacos:application-${spring.profiles.active}.${spring.config.file-extension}
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.${spring.config.file-extension}
+logging:
+  level:
+    com.alibaba.nacos.client.config.impl: WARN

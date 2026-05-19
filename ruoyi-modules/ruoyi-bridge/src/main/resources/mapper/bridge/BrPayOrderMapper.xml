@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bridge.mapper.BrPayOrderMapper">
+
+    <resultMap type="BrPayOrder" id="BrPayOrderResult">
+        <result property="orderId"         column="order_id"          />
+        <result property="channelOrderId"  column="channel_order_id"  />
+        <result property="channelKey"      column="channel_key"       />
+        <result property="serverId"        column="server_id"         />
+        <result property="playerId"        column="player_id"         />
+        <result property="userId"          column="user_id"           />
+        <result property="identityId"      column="identity_id"       />
+        <result property="productId"       column="product_id"        />
+        <result property="productName"     column="product_name"      />
+        <result property="amount"          column="amount"            />
+        <result property="gameCurrency"    column="game_currency"     />
+        <result property="currency"        column="currency"          />
+        <result property="payStatus"       column="pay_status"        />
+        <result property="exchangeUrl"     column="exchange_url"      />
+        <result property="payWay"          column="pay_way"           />
+        <result property="equipment"       column="equipment"         />
+        <result property="remark"          column="remark"            />
+        <result property="orderTime"       column="order_time"        />
+        <result property="payTime"         column="pay_time"          />
+        <result property="createTime"      column="create_time"       />
+        <result property="updateTime"      column="update_time"       />
+    </resultMap>
+
+    <sql id="selectVo">
+        select order_id, channel_order_id, channel_key, server_id, player_id,
+               user_id, identity_id, product_id, product_name, amount,
+               game_currency, currency, pay_status, exchange_url, pay_way,
+               equipment, remark, order_time, pay_time, create_time, update_time
+        from br_pay_order
+    </sql>
+
+    <select id="selectByOrderId" parameterType="String" resultMap="BrPayOrderResult">
+        <include refid="selectVo"/>
+        where order_id = #{orderId}
+    </select>
+
+    <select id="selectByChannelOrder" resultMap="BrPayOrderResult">
+        <include refid="selectVo"/>
+        where channel_key = #{channelKey}
+          and channel_order_id = #{channelOrderId}
+    </select>
+
+    <select id="selectList" parameterType="BrPayOrder" resultMap="BrPayOrderResult">
+        <include refid="selectVo"/>
+        <where>
+            <if test="channelKey != null and channelKey != ''">
+                AND channel_key = #{channelKey}
+            </if>
+            <if test="serverId != null">
+                AND server_id = #{serverId}
+            </if>
+            <if test="payStatus != null">
+                AND pay_status = #{payStatus}
+            </if>
+            <if test="productId != null and productId != ''">
+                AND product_id = #{productId}
+            </if>
+        </where>
+        order by order_time desc
+    </select>
+
+    <insert id="insert" parameterType="BrPayOrder">
+        insert into br_pay_order (
+            order_id, channel_order_id, channel_key, server_id, player_id,
+            user_id, identity_id, product_id, product_name, amount,
+            game_currency, currency, pay_status, exchange_url, pay_way,
+            equipment, remark, order_time, pay_time
+        ) values (
+            #{orderId}, #{channelOrderId}, #{channelKey}, #{serverId}, #{playerId},
+            #{userId}, #{identityId}, #{productId}, #{productName}, #{amount},
+            #{gameCurrency}, #{currency}, #{payStatus}, #{exchangeUrl}, #{payWay},
+            #{equipment}, #{remark}, #{orderTime}, #{payTime}
+        )
+    </insert>
+
+    <update id="update" parameterType="BrPayOrder">
+        update br_pay_order
+        <set>
+            <if test="channelOrderId != null">channel_order_id = #{channelOrderId},</if>
+            <if test="payStatus != null">pay_status = #{payStatus},</if>
+            <if test="exchangeUrl != null">exchange_url = #{exchangeUrl},</if>
+            <if test="payTime != null">pay_time = #{payTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where order_id = #{orderId}
+    </update>
+
+    <delete id="deleteByIds" parameterType="String">
+        delete from br_pay_order where order_id in
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+
+</mapper>

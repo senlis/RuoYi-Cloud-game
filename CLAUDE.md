@@ -1,56 +1,9 @@
-# AGENTS.md
+# CLAUDE.md
 
 你好，这是一个基于 Spring Cloud 的游戏通用管理后台项目。本文档是你在本仓库中进行代码生成、开发、修改的唯一最高准则，必须严格遵守所有规则。
 ## 需求文档
 -- 需求文档存放在docs
 ## 构建与运行命令
-
-### 后端 (Maven, JDK 17+)
-
-```bash
-# 打包所有模块（跳过测试 - 项目无测试用例）
-mvn clean package -Dmaven.test.skip=true
-
-# 打包单个模块（以 system 为例，-am 同时构建依赖模块）
-mvn clean package -pl ruoyi-modules/ruoyi-system -am -Dmaven.test.skip=true
-
-# 运行单个服务（在项目根目录执行）
-java -Xms512m -Xmx1024m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m -Dfile.encoding=utf-8 -jar ruoyi-auth/target/ruoyi-auth.jar
-```
-
-Windows 批处理脚本位于 `bin/` 目录：`run-gateway.bat`、`run-auth.bat`、`run-modules-system.bat`、`run-modules-gen.bat`、`run-modules-job.bat`、`run-modules-file.bat`、`run-monitor.bat`。
-
-### 前端 (ruoyi-ui/, Vue 3 + Element UI)
-
-```bash
-# 进入项目目录
-cd ruoyi-vue3
-
-# 安装依赖
-yarn --registry=https://registry.npmmirror.com
-
-# 启动服务
-yarn dev
-
-# 构建测试环境 yarn build:stage
-# 构建生产环境 yarn build:prod
-# 前端访问地址 http://localhost:80
-
-```
-
-环境变量文件：`.env.development`（API 前缀 `/dev-api`）、`.env.production`（`/prod-api`）。
-
-### 基础设施 (Docker)
-
-```bash
-cd docker
-# 先启动基础服务
-docker-compose up -d ruoyi-mysql ruoyi-redis ruoyi-nacos
-# 再启动应用服务
-docker-compose up -d ruoyi-gateway ruoyi-auth ruoyi-modules-system ruoyi-nginx
-```
-
-依赖基础设施：MySQL 5.7（端口 3306）、Redis（端口 6379）、Nacos 3.x（端口 8848）。
 
 ## 架构概览
 
@@ -91,15 +44,16 @@ docker-compose up -d ruoyi-gateway ruoyi-auth ruoyi-modules-system ruoyi-nginx
 
 ### 服务端口映射
 
-| 服务 | 端口 | 模块路径 |
-|------|------|----------|
-| 网关 | 8080 | `ruoyi-gateway/` |
-| 认证中心 | 9200 | `ruoyi-auth/` |
+| 服务   | 端口   | 模块路径                          |
+|------|------|-------------------------------|
+| 网关   | 8080 | `ruoyi-gateway/`              |
+| 认证中心 | 9200 | `ruoyi-auth/`                 |
 | 系统模块 | 9201 | `ruoyi-modules/ruoyi-system/` |
-| 代码生成 | 9202 | `ruoyi-modules/ruoyi-gen/` |
-| 定时任务 | 9203 | `ruoyi-modules/ruoyi-job/` |
-| 文件服务 | 9300 | `ruoyi-modules/ruoyi-file/` |
+| 代码生成 | 9202 | `ruoyi-modules/ruoyi-gen/`    |
+| 定时任务 | 9203 | `ruoyi-modules/ruoyi-job/`    |
+| 文件服务 | 9300 | `ruoyi-modules/ruoyi-file/`   |
 | 监控中心 | 9100 | `ruoyi-visual/ruoyi-monitor/` |
+| 对外服务 | 9400 | `ruoyi-modules/ruoyi-gserve/` |
 
 ### 认证流程
 
@@ -133,6 +87,7 @@ ruoyi-common（公共模块）
     ├── common-sensitive    -- @Sensitive 注解，响应数据脱敏
     ├── common-seata        -- Seata 分布式事务集成
     └── common-swagger      -- SpringDoc OpenAPI 自动配置
+    
 
 ruoyi-api（Feign 接口定义）
     └── ruoyi-api-system    -- RemoteUserService、RemoteFileService、RemoteLogService + 领域对象

@@ -32,4 +32,6 @@ security:
       - /*/v3/api-docs
       - /csrf
       - /system/game/*/clientConfig    # ← 新增：客户端获取区服配置（无需认证）
+      - /bridge/health                  # ← 新增：桥接服务健康检查
+      - /bridge/pay/*/notify            # ← 新增：渠道支付回调（无需认证）
 ```

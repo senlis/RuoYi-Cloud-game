@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bridge.mapper.BrChannelArgConfigMapper">
+
+    <resultMap type="BrChannelArgConfig" id="BrChannelArgConfigResult">
+        <result property="channelId"      column="channel_id"       />
+        <result property="channelKey"     column="channel_key"      />
+        <result property="regionKey"      column="region_key"       />
+        <result property="platformName"   column="platform_name"    />
+        <result property="packageName"    column="package_name"     />
+        <result property="appId"          column="app_id"           />
+        <result property="appKey"         column="app_key"          />
+        <result property="payKey"         column="pay_key"          />
+        <result property="authUrl"        column="auth_url"         />
+        <result property="packageParams"  column="package_params"   />
+        <result property="sort"           column="sort"             />
+        <result property="status"         column="status"           />
+        <result property="remark"         column="remark"           />
+        <result property="createTime"     column="create_time"      />
+        <result property="updateTime"     column="update_time"      />
+    </resultMap>
+
+    <sql id="selectVo">
+        select channel_id, channel_key, region_key, platform_name, package_name,
+               app_id, app_key, pay_key, auth_url, package_params,
+               sort, status, remark, create_time, update_time
+        from br_channel_arg_config
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="BrChannelArgConfigResult">
+        <include refid="selectVo"/> where channel_id = #{channelId}
+    </select>
+
+    <select id="selectByKey" resultMap="BrChannelArgConfigResult">
+        <include refid="selectVo"/> where channel_key = #{channelKey} and region_key = #{regionKey}
+    </select>
+
+    <select id="selectList" parameterType="BrChannelArgConfig" resultMap="BrChannelArgConfigResult">
+        <include refid="selectVo"/>
+        <where>
+            <if test="channelKey != null and channelKey != ''">AND channel_key = #{channelKey}</if>
+            <if test="regionKey != null and regionKey != ''">AND region_key = #{regionKey}</if>
+            <if test="platformName != null and platformName != ''">AND platform_name LIKE CONCAT('%', #{platformName}, '%')</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        order by sort asc, channel_id asc
+    </select>
+
+    <insert id="insert" parameterType="BrChannelArgConfig" useGeneratedKeys="true" keyProperty="channelId">
+        insert into br_channel_arg_config (
+            channel_key, region_key, platform_name, package_name,
+            app_id, app_key, pay_key, auth_url, package_params,
+            sort, status, remark
+        ) values (
+            #{channelKey}, #{regionKey}, #{platformName}, #{packageName},
+            #{appId}, #{appKey}, #{payKey}, #{authUrl}, #{packageParams},
+            #{sort}, #{status}, #{remark}
+        )
+    </insert>
+
+    <update id="update" parameterType="BrChannelArgConfig">
+        update br_channel_arg_config
+        <set>
+            <if test="channelKey != null">channel_key = #{channelKey},</if>
+            <if test="regionKey != null">region_key = #{regionKey},</if>
+            <if test="platformName != null">platform_name = #{platformName},</if>
+            <if test="packageName != null">package_name = #{packageName},</if>
+            <if test="appId != null">app_id = #{appId},</if>
+            <if test="appKey != null">app_key = #{appKey},</if>
+            <if test="payKey != null">pay_key = #{payKey},</if>
+            <if test="authUrl != null">auth_url = #{authUrl},</if>
+            <if test="packageParams != null">package_params = #{packageParams},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where channel_id = #{channelId}
+    </update>
+
+    <delete id="deleteByIds" parameterType="Long">
+        delete from br_channel_arg_config where channel_id in
+        <foreach item="channelId" collection="array" open="(" separator="," close=")">#{channelId}</foreach>
+    </delete>
+</mapper>
