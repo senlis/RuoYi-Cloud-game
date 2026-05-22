@@ -1,13 +1,13 @@
 package com.ruoyi.bridge.controller;
 
 import com.ruoyi.bridge.constant.PayOrderStatus;
+import com.ruoyi.bridge.datasource.ChannelDs;
 import com.ruoyi.bridge.domain.BrPayOrder;
 import com.ruoyi.bridge.domain.OrderResult;
 import com.ruoyi.bridge.domain.dto.ExchangeResult;
 import com.ruoyi.bridge.mapper.GameServerMapper;
 import com.ruoyi.bridge.pay.PayOrderRequest;
 import com.ruoyi.bridge.config.ConfigConstant;
-import com.ruoyi.bridge.service.IBrChannelArgConfigService;
 import com.ruoyi.bridge.service.IBrPayOrderService;
 import com.ruoyi.bridge.service.impl.BrPayOrderServiceImpl;
 import com.ruoyi.common.core.domain.R;
@@ -44,9 +44,6 @@ public class OrderController {
     @Autowired
     private GameServerMapper gameServerMapper;
 
-    @Autowired
-    private IBrChannelArgConfigService iBrChannelArgConfigService;
-
     /**
      * 订单参数校验 （统一公共使用）
      *
@@ -75,6 +72,7 @@ public class OrderController {
      * 预创建订单 — 玩家支付前调用
      * 自动根据 serverId 从 game_server 获取 backend_url 填充 exchangeUrl
      */
+    @ChannelDs("#req.channelKey")
     @PostMapping("/preCreate")
     public R<OrderResult> preCreateOrder(@RequestBody PayOrderRequest req) {
         R<OrderResult> orderResult = creatOrderValidate(req.getPlayerId(), req.getIdentityId(), req.getServerId(), req.getPrice(), req.getSign());

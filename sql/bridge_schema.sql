@@ -2,31 +2,7 @@
 -- 渠道桥接模块数据库脚本
 -- =========================================
 
--- ----------------------------
--- 渠道配置表
--- channel_key 唯一定位一组出包参数（渠道+发行平台）
--- 例如：huawei_overseas、huawei_cn、oppo_cn
--- ----------------------------
-DROP TABLE IF EXISTS br_channel_arg_config;
-CREATE TABLE br_channel_arg_config (
-    channel_id      BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    channel_key     VARCHAR(64)  NOT NULL COMMENT '渠道唯一标识（来源于 game_channel.channel_code）',
-    region_key      VARCHAR(128) NOT NULL COMMENT '分区KEY(来源于game_region.region_code)',
-    platform_name   VARCHAR(64)  DEFAULT NULL COMMENT '发行平台（如 cn/overseas/hk）',
-    package_name    VARCHAR(64)  DEFAULT NULL COMMENT '包名',
-    app_id          VARCHAR(256) DEFAULT NULL COMMENT '渠道分配的AppID',
-    app_key         TEXT         DEFAULT NULL COMMENT '渠道分配的AppKey',
-    pay_key         TEXT         DEFAULT NULL COMMENT '支付公钥',
-    auth_url        VARCHAR(512) DEFAULT NULL COMMENT 'SDK认证接口地址',
-    package_params  TEXT         DEFAULT NULL COMMENT '其他出包参数(JSON)',
-    status          CHAR(1)      DEFAULT '0' COMMENT '状态（0正常 1停用）',
-    sort            INT(4)       DEFAULT 0  COMMENT '显示顺序',
-    remark          VARCHAR(500) DEFAULT NULL COMMENT '备注',
-    create_time     DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    update_time     DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (channel_id),
-    UNIQUE KEY uk_channel_region (channel_key, region_key)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='渠道参数配置表';
+
 
 -- ----------------------------
 -- 用户表（渠道用户绑定）
@@ -78,3 +54,26 @@ CREATE TABLE br_pay_order (
     KEY idx_channel_order (channel_key, channel_order_id),
     KEY idx_order_time (order_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='支付订单表';
+
+
+
+-- ----------------------------
+-- 角色信息表（按渠道分库存储）
+-- ----------------------------
+DROP TABLE IF EXISTS br_role;
+CREATE TABLE br_role (
+    player_id        BIGINT       NOT NULL COMMENT '角色ID',
+    channel_key      VARCHAR(64)  NOT NULL COMMENT '渠道KEY',
+    region_code      VARCHAR(128) DEFAULT NULL COMMENT '分区CODE',
+    server_id        INT          DEFAULT NULL COMMENT '服务器ID',
+    account_id       VARCHAR(128) DEFAULT NULL COMMENT '账号ID',
+    role_name        VARCHAR(128) DEFAULT NULL COMMENT '角色名',
+    level            INT          DEFAULT 1 COMMENT '等级',
+    vocation         INT          DEFAULT 0 COMMENT '职业',
+    vip              INT          DEFAULT 0 COMMENT 'VIP等级',
+    fight            BIGINT       DEFAULT 0 COMMENT '战斗力',
+    create_time      DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    update_time      DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (player_id),
+    KEY idx_account (channel_key, account_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色信息表';

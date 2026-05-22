@@ -10,7 +10,7 @@
 本项目是基于 Spring Cloud 的微服务管理平台（RuoYi-Cloud v3.6.8），请求链路如下：
 
 ```
-客户端 -> Nginx(:80) -> Gateway(:8080) -> Auth(:9200) / System(:9201) / Gen(:9202) / Job(:9203) / File(:9300)
+客户端 -> Nginx(:80) -> Gateway(:8080) -> Auth(:9200) / System(:9201) / Gen(:9202) / Job(:9203) / File(:9300) / Gserve(:9400) / Bridge(:9500)
                                               |
                                         Nacos(:8848) -- 服务注册与配置中心
                                               |
@@ -53,7 +53,8 @@
 | 定时任务 | 9203 | `ruoyi-modules/ruoyi-job/`    |
 | 文件服务 | 9300 | `ruoyi-modules/ruoyi-file/`   |
 | 监控中心 | 9100 | `ruoyi-visual/ruoyi-monitor/` |
-| 对外服务 | 9400 | `ruoyi-modules/ruoyi-gserve/` |
+| 日志上传 | 9400 | `ruoyi-modules/ruoyi-gserve/` |
+| 登录充值 | 9500 | `ruoyi-modules/ruoyi-bridge/` |
 
 ### 认证流程
 

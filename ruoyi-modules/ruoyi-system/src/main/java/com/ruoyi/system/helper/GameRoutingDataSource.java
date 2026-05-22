@@ -3,6 +3,7 @@ package com.ruoyi.system.helper;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.ruoyi.system.domain.BrPlatformConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
@@ -89,6 +90,43 @@ public class GameRoutingDataSource extends AbstractRoutingDataSource
     {
         String dsName = "log_" + regionId + "_" + serverId;
         return getOrCreate(dsName, dbConfigJson);
+    }
+
+    /**
+     * 获取或创建渠道数据库数据源
+     *
+     * @param channelKey 渠道KEY
+     * @param config     渠道平台配置
+     * @return 数据源名称（"channel_" + channelKey）
+     */
+    public String getOrCreateChannelDb(String channelKey, BrPlatformConfig config)
+    {
+        String dsName = "channel_" + channelKey;
+        if (!gameDataSources.containsKey(dsName))
+        {
+            DruidDataSource ds = new DruidDataSource();
+            ds.setName(dsName);
+            ds.setUrl("jdbc:mysql://" + config.getDbHost() + ":" + config.getDbPort() + "/"
+                    + config.getDbName() + "?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&connectTimeout=5000");
+            ds.setUsername(config.getDbUser());
+            ds.setPassword(config.getDbPwd());
+            ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
+            ds.setInitialSize(3);
+            ds.setMinIdle(3);
+            ds.setMaxActive(10);
+            ds.setMaxWait(5000L);
+            try
+            {
+                ds.init();
+                gameDataSources.put(dsName, ds);
+                log.info("已创建渠道数据源: {} -> {}", dsName, config.getDbHost());
+            }
+            catch (SQLException e)
+            {
+                throw new RuntimeException("渠道数据源初始化失败: " + dsName, e);
+            }
+        }
+        return dsName;
     }
 
     private String getOrCreate(String dsName, String dbConfigJson)

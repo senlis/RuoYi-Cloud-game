@@ -83,6 +83,6 @@ public interface BrChannelArgConfigMapper {
     @Select("SELECT channel_code AS channelCode, channel_name AS channelName FROM game_channel WHERE status = '0' ORDER BY sort")
     List<Map<String, Object>> selectChannelOptions();
 
-    @Select("SELECT region_code AS regionCode, region_name AS regionName FROM game_region WHERE channel_id = (SELECT channel_id FROM game_channel WHERE channel_code = #{channelCode}) AND status = '0' ORDER BY sort")
+    @Select("SELECT region_id AS regionId, region_code AS regionCode, region_name AS regionName FROM game_region WHERE channel_id = (SELECT channel_id FROM game_channel WHERE channel_code = #{channelCode}) AND status = '0' ORDER BY sort")
     List<Map<String, Object>> selectRegionOptions(String channelCode);
 }
