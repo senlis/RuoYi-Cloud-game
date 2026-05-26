@@ -77,7 +77,7 @@
 
     <!-- ====== 操作区 ====== -->
     <div class="ss-actions">
-      <el-date-picker v-model="dateRange" type="daterange" size="small"
+      <el-date-picker v-if="showDatePicker" v-model="dateRange" type="daterange" size="small"
                       range-separator="~" start-placeholder="开始日期" end-placeholder="结束日期"
                       value-format="yyyy-MM-dd" style="margin-right:10px" />
       <el-button type="primary" size="small" icon="el-icon-search" @click="doQuery">查询</el-button>
@@ -94,7 +94,10 @@ import { listServerByRegion } from "@/api/game/server";
 
 export default {
   name: "ServerSelector",
-  props: { value: { type: Object, default: () => ({ projectId: null, serverIds: [] }) } },
+  props: {
+    value: { type: Object, default: () => ({ projectId: null, serverIds: [] }) },
+    showDatePicker: { type: Boolean, default: true }
+  },
   data() {
     return {
       projects: [], channels: [], regions: [], servers: [],
@@ -104,7 +107,9 @@ export default {
       regionAll: false, regionIndeterminate: false,
       serverAll: false, serverIndeterminate: false,
       serverSearch: "", daysFrom: null, daysTo: null, dateRange: [],
-      _serverDays: {}
+      _serverDays: {},
+      _restoring: false,
+      _pendingServerIds: null
     };
   },
   computed: {
@@ -121,8 +126,47 @@ export default {
     }
   },
   watch: {
+    value: {
+      deep: true,
+      handler(val) {
+        // 重置：外部清空选择（如新建邮件时）— 即使 _restoring 中也要强制清空
+        if (!val || !val.projectId) {
+          this._restoring = false
+          this._pendingServerIds = null
+          this.selectedProjects = []; this.selectedChannels = []; this.selectedRegions = []; this.selectedServers = [];
+          this.channels = []; this.regions = []; this.servers = [];
+          return
+        }
+        if (this._restoring) return
+        const currPid = this.selectedProjects.length > 0 ? this.selectedProjects[0] : null
+        if (currPid === val.projectId && !val._forceRestore) return
+        this._restoring = true
+        this._pendingServerIds = val.serverIds || []
+        // 选中项目
+        this.selectedProjects = [val.projectId]
+        // 加载渠道数据
+        this.channels = []
+        this.loadChannels([val.projectId])
+      }
+    },
     selectedProjects(v) { this.projectAll = v.length > 0 && v.length === this.projects.length;
       this.projectIndeterminate = v.length > 0 && v.length < this.projects.length; },
+    channels(v) {
+      // 回填：渠道数据已加载 → 选中渠道（有记录则用记录，无记录则全选）→ 加载分区
+      if (this._restoring && v.length > 0 && this.regions.length === 0) {
+        const want = (this.value && this.value.channelIds) || []
+        if (want.length > 0) { this.selectedChannels = want; this.loadRegions(want) }
+        else { this.selectedChannels = v.map(c => c.channelId); this.loadRegions(this.selectedChannels) }
+      }
+    },
+    regions(v) {
+      // 回填：分区数据已加载 → 选中分区（有记录则用记录，无记录则全选）→ 加载服务器
+      if (this._restoring && v.length > 0 && this.servers.length === 0) {
+        const want = (this.value && this.value.regionIds) || []
+        if (want.length > 0) { this.selectedRegions = want; this.loadServers(want) }
+        else { this.selectedRegions = v.map(r => r.regionId); this.loadServers(this.selectedRegions) }
+      }
+    },
     selectedChannels(v) { this.channelAll = v.length > 0 && v.length === this.channels.length;
       this.channelIndeterminate = v.length > 0 && v.length < this.channels.length; },
     selectedRegions(v) { this.regionAll = v.length > 0 && v.length === this.regions.length;
@@ -167,7 +211,17 @@ export default {
           });
           const arr = [...map.values()].sort((a, b) => (a.serverId || 0) - (b.serverId || 0));
           this.servers = arr;
-          this.selectedServers = [];
+          // 外部回填：恢复服务器选中状态
+          if (this._restoring && this._pendingServerIds) {
+            this.selectedServers = arr
+              .filter(s => this._pendingServerIds.includes(s.serverId))
+              .map(s => s.serverId + '_' + s.regionId);
+            this._restoring = false;
+            this._pendingServerIds = null;
+            this.emitChange();
+          } else {
+            this.selectedServers = [];
+          }
           this._serverDays = {};
           this.serverSearch = "";
         }).catch(e => {
@@ -203,13 +257,18 @@ export default {
     emitChange() {
       const ids = this.selectedServers.map(v => parseInt(v.split('_')[0]));
       const pid = this.selectedProjects.length > 0 ? this.selectedProjects[0] : null;
-      this.$emit("input", { projectId: pid, serverIds: ids });
+      this.$emit("input", {
+        projectId: pid,
+        channelIds: [...this.selectedChannels],
+        regionIds: [...this.selectedRegions],
+        serverIds: ids
+      });
     },
     doQuery() {
       if (this.selectedProjects.length === 0) { this.$message.warning("请先选择项目"); return; }
       if (this.selectedChannels.length === 0) { this.$message.warning("请先选择渠道"); return; }
       if (this.selectedRegions.length === 0) { this.$message.warning("请先选择分区"); return; }
-      if (!this.dateRange || this.dateRange.length !== 2) { this.$message.warning("请选择日期范围"); return; }
+      if (this.showDatePicker && (!this.dateRange || this.dateRange.length !== 2)) { this.$message.warning("请选择日期范围"); return; }
       this.$emit("query", {
         projectId: this.selectedProjects.length > 0 ? this.selectedProjects[0] : null,
         serverIds: this.selectedServers.map(v => parseInt(v.split('_')[0]))
@@ -220,7 +279,7 @@ export default {
       this.channels = []; this.regions = []; this.servers = [];
       this.serverSearch = ""; this.daysFrom = null; this.daysTo = null; this.dateRange = [];
       this._serverDays = {};
-      this.$emit("input", { projectId: null, serverIds: [] });
+      this.$emit("input", { projectId: null, channelIds: [], regionIds: [], serverIds: [] });
     },
     dayz(s) {
       if (!s || !s.openTime) return 0;

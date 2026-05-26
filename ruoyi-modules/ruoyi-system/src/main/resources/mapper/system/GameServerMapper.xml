@@ -179,4 +179,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <select id="selectGameServerByCodes" resultMap="GameServerResult" parameterType="java.util.List">
+        <include refid="selectGameServerVo"/>
+        <where>
+            s.server_id IN
+            <foreach item="code" collection="list" open="(" separator="," close=")">
+                #{code}
+            </foreach>
+        </where>
+        ORDER BY s.server_id ASC
+    </select>
+
 </mapper>

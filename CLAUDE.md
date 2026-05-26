@@ -146,29 +146,4 @@ ORM 使用 MyBatis + XML 映射文件，分页通过 PageHelper 实现。
 
 项目中所有需要选择游戏服务器的功能，必须使用统一封装的 `ServerSelector` 组件（`src/components/game/ServerSelector.vue`），不得自行实现简易的服务器下拉框。
 
-**组件能力：**
-- 四级联动：项目 → 渠道 → 分区 → 服务器，根据用户权限自动过滤可选范围
-- 每级支持多选（`multiple` + `collapse-tags`）
-- 服务器选项显示开服天数，格式：`测试1服(开服8天)`
-- 下拉列表支持滚动（Element UI 的 `el-select` 自带此能力）
-- 输出格式：`{ projectId: Long, serverIds: [Int] }`，供后端 `projectId` 路由 ClickHouse + `server_id IN (...)` 过滤
-
-**使用方式：**
-```vue
-<template>
-  <ServerSelector v-model="serverSelection" />
-</template>
-
-<script>
-import ServerSelector from "@/components/game/ServerSelector";
-export default {
-  components: { ServerSelector },
-  data() {
-    return { serverSelection: { projectId: null, serverIds: [] } };
-  }
-}
-</script>
-```
-
-**后端接口适配：**
-使用该组件的地方，后端 Controller 需接收 `projectId`（Long）+ `serverIds`（String，逗号分隔），SQL 使用 `server_id IN (${serverIds})` 做多服过滤。
+> 完整用法规范（数据字段、使用方式、编辑回填、保存提取）见 [`docs/server_selector_usage.md`](docs/server_selector_usage.md)

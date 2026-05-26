@@ -52,6 +52,14 @@ public interface GameServerMapper
     public GameServer selectGameServerByRegionAndId(Long regionId, Integer serverId);
 
     /**
+     * 根据服务器ID列表查询游戏服务器
+     *
+     * @param serverIds 服务器ID列表
+     * @return 游戏服务器集合
+     */
+    public List<GameServer> selectGameServerByCodes(List<Integer> serverIds);
+
+    /**
      * 新增游戏服务器
      *
      * @param server 游戏服务器信息

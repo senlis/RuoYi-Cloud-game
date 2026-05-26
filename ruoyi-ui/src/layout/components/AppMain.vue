@@ -2,7 +2,7 @@
   <section class="app-main">
     <transition name="fade-transform" mode="out-in">
       <keep-alive>
-        <router-view v-if="!$route.meta.link" />
+        <router-view :key="$route.fullPath" v-if="!$route.meta.link" />
       </keep-alive>
     </transition>
     <iframe-toggle />

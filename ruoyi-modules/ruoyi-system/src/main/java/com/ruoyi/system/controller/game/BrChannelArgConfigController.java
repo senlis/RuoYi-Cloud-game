@@ -7,7 +7,10 @@ import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.system.domain.BrChannelArgConfig;
+import com.ruoyi.system.domain.GameChannel;
+import com.ruoyi.system.helper.GameAuthContext;
 import com.ruoyi.system.mapper.BrChannelArgConfigMapper;
+import com.ruoyi.system.service.IGameChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +32,12 @@ public class BrChannelArgConfigController extends BaseController {
 
     @Autowired
     private BrChannelArgConfigMapper brChannelArgConfigMapper;
+
+    @Autowired
+    private IGameChannelService gameChannelService;
+
+    @Autowired
+    private GameAuthContext gameAuthContext;
 
     @RequiresPermissions("bridge:channelArg:list")
     @GetMapping("/list")
@@ -70,15 +79,34 @@ public class BrChannelArgConfigController extends BaseController {
         return toAjax(brChannelArgConfigMapper.deleteByIds(ids));
     }
 
-    /** 渠道下拉选项 */
+    /** 渠道下拉选项（已按权限过滤） */
     @GetMapping("/channelOptions")
     public AjaxResult channelOptions() {
-        return success(brChannelArgConfigMapper.selectChannelOptions());
+        List<GameChannel> list = gameChannelService.selectGameChannelList(new GameChannel());
+        List<Map<String, Object>> options = list.stream().map(c -> {
+            Map<String, Object> m = new java.util.LinkedHashMap<>();
+            m.put("channelCode", c.getChannelCode());
+            m.put("channelName", c.getChannelName());
+            return m;
+        }).collect(java.util.stream.Collectors.toList());
+        return success(options);
     }
 
-    /** 分区下拉选项 */
+    /** 分区下拉选项（已按权限过滤） */
     @GetMapping("/regionOptions/{channelCode}")
     public AjaxResult regionOptions(@PathVariable String channelCode) {
-        return success(brChannelArgConfigMapper.selectRegionOptions(channelCode));
+        List<Map<String, Object>> regions = brChannelArgConfigMapper.selectRegionOptions(channelCode);
+        if (!gameAuthContext.isAdmin()) {
+            List<Long> authIds = gameAuthContext.getAuthRegionIds();
+            if (authIds != null && !authIds.isEmpty()) {
+                regions = regions.stream()
+                    .filter(r -> r.get("regionId") != null && authIds.contains(
+                        ((Number) r.get("regionId")).longValue()))
+                    .collect(java.util.stream.Collectors.toList());
+            } else if (authIds != null && authIds.isEmpty()) {
+                regions = java.util.Collections.emptyList();
+            }
+        }
+        return success(regions);
     }
 }

@@ -167,6 +167,78 @@ export const dynamicRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
       }
     ]
+  },
+  {
+    path: '/gm/mail/add',
+    component: Layout,
+    hidden: true,
+    permissions: ['gm:mail:add'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/gm/mail/form'),
+        name: 'GmMailAdd',
+        meta: { title: '新建GM邮件', activeMenu: '/gm/mail', keepAlive: true }
+      }
+    ]
+  },
+  {
+    path: '/gm/mail/audit',
+    component: Layout,
+    hidden: true,
+    permissions: ['gm:mail:audit'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/gm/mail/audit'),
+        name: 'GmMailAudit',
+        meta: { title: 'GM邮件审核', activeMenu: '/gm/mail', keepAlive: true }
+      }
+    ]
+  },
+  {
+    path: '/gm/mail/edit/:mailId(\\d+)',
+    component: Layout,
+    hidden: true,
+    permissions: ['gm:mail:edit'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/gm/mail/form'),
+        name: 'GmMailEdit',
+        meta: { title: '编辑GM邮件', activeMenu: '/gm/mail', keepAlive: true }
+      }
+    ]
+  },
+  {
+    path: '/gm/resource/add',
+    component: Layout,
+    hidden: true,
+    permissions: ['gm:resource:add'],
+    children: [{
+      path: '', component: () => import('@/views/gm/resource/form'),
+      name: 'ResourceAdd', meta: { title: '新建资源申请', activeMenu: '/gm/resource' }
+    }]
+  },
+  {
+    path: '/gm/resource/edit/:requestId(\\d+)',
+    component: Layout,
+    hidden: true,
+    permissions: ['gm:resource:edit'],
+    children: [{
+      path: '', component: () => import('@/views/gm/resource/form'),
+      name: 'ResourceEdit', meta: { title: '编辑资源申请', activeMenu: '/gm/resource' }
+    }]
+  },
+  {
+    path: '/gm/resource/audit',
+    component: Layout,
+    hidden: true,
+    permissions: ['gm:resource:audit'],
+    children: [{
+      path: '', component: () => import('@/views/gm/resource/audit'),
+      name: 'ResourceAudit', meta: { title: '资源申请审批', activeMenu: '/gm/resource' }
+    }]
   }
 ]
 
