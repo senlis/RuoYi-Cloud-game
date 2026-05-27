@@ -24,3 +24,7 @@ spring:
     import:
       - nacos:application-${spring.profiles.active}.${spring.config.file-extension}
       - nacos:${spring.application.name}-${spring.profiles.active}.${spring.config.file-extension}
+logging:
+  level:
+    com.alibaba.nacos.client.config.impl: WARN
+    com.alibaba.nacos: WARN

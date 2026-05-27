@@ -142,6 +142,12 @@ ORM 使用 MyBatis + XML 映射文件，分页通过 PageHelper 实现。
 - 状态管理：Vuex store，位于 `src/store/modules/`
 - 工具函数：`src/utils/`（request.js 封装 axios，自动注入令牌和统一错误处理）
 
+### 游戏服务器推送 API 规范（`gameapi/`）
+
+所有向游戏服务器推送数据的接口（GM 邮件、资源发放等），**必须**在 [`gameapi/`](gameapi/) 目录下编写对应的接口文档，说明请求参数、签名规则、响应格式。
+
+> 当前已定义的推送接口见 [`gameapi/README.md`](gameapi/README.md)
+
 ### 通用服务器选择组件规范
 
 项目中所有需要选择游戏服务器的功能，必须使用统一封装的 `ServerSelector` 组件（`src/components/game/ServerSelector.vue`），不得自行实现简易的服务器下拉框。
