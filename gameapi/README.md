@@ -30,10 +30,22 @@ sign = MD5(key1 + value1 + key2 + value2 + ... + md5Key)
 
 ## API 列表
 
+### 管理后台 → 游戏服务器（推送）
+
 | 路径 | 说明 | 文档 |
 |------|------|------|
 | `POST {backendUrl}/mail` | GM 邮件推送 | [mail.md](mail.md) |
 | `POST {backendUrl}/resource` | 资源发放推送 | [resource.md](resource.md) |
+
+### 游戏客户端 → Bridge 服务（SDK 接入）
+
+| 路径 | 说明 | 文档 |
+|------|------|------|
+| `GET /bridge/auth` | 渠道认证（登录/注册） | [auth.md](auth.md) |
+| `POST /bridge/order/preCreate` | 预创建订单 | [order.md](order.md) |
+| `GET /bridge/order/{orderId}` | 查询订单 | [order.md](order.md) |
+| `POST /bridge/order/{orderId}/rescue` | 补单（兑换失败重新发起） | [order.md](order.md) |
+| `GET /bridge/health` | 健康检查 | — |
 
 ## 通用返回格式
 

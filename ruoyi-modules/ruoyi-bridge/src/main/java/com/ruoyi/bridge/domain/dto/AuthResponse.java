@@ -1,10 +1,13 @@
 package com.ruoyi.bridge.domain.dto;
 
+import lombok.Data;
+
 /**
  * 渠道认证响应DTO
  *
  * @author ruoyi
  */
+@Data
 public class AuthResponse {
 
     /** 平台唯一标识 */

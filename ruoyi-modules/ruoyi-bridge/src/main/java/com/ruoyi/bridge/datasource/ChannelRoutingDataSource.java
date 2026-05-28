@@ -123,7 +123,7 @@ public class ChannelRoutingDataSource extends AbstractRoutingDataSource {
         }
 
         String url = "jdbc:mysql://" + config.getDbHost() + ":" + config.getDbPort() + "/"
-                + config.getDbName() + "?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8mb4";
+                + config.getDbName() + "?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8";
 
         DruidDataSource ds = new DruidDataSource();
         ds.setName("channel-" + channelKey);

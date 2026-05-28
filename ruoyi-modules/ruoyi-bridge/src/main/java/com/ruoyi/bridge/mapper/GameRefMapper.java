@@ -28,4 +28,24 @@ public interface GameRefMapper {
      */
     @Select("SELECT region_code AS \"regionCode\", region_name AS \"regionName\" FROM game_region WHERE channel_id = (SELECT channel_id FROM game_channel WHERE channel_code = #{channelCode}) AND status = '0' ORDER BY sort")
     List<Map<String, Object>> selectRegionOptions(@Param("channelCode") String channelCode);
+
+    /**
+     * 根据渠道编码查询项目ID
+     */
+    @Select("SELECT project_id FROM game_channel WHERE channel_code = #{channelCode}")
+    Long selectProjectIdByChannelCode(@Param("channelCode") String channelCode);
+
+    /**
+     * 查询项目的 dynamic_fields（用于获取 md5key）
+     */
+    @Select("SELECT dynamic_fields FROM game_project WHERE project_id = #{projectId}")
+    String selectProjectDynamicFields(@Param("projectId") Long projectId);
+
+    /**
+     * 一次性查询：channelCode → game_channel.project_id → game_project.dynamic_fields → md5key
+     */
+    @Select("SELECT gp.dynamic_fields FROM game_channel gc"
+            + " INNER JOIN game_project gp ON gc.project_id = gp.project_id"
+            + " WHERE gc.channel_code = #{channelCode}")
+    String selectProjectDynamicFieldsByChannelCode(@Param("channelCode") String channelCode);
 }

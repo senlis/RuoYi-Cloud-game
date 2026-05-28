@@ -107,7 +107,7 @@ public class GameRoutingDataSource extends AbstractRoutingDataSource
             DruidDataSource ds = new DruidDataSource();
             ds.setName(dsName);
             ds.setUrl("jdbc:mysql://" + config.getDbHost() + ":" + config.getDbPort() + "/"
-                    + config.getDbName() + "?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&connectTimeout=5000");
+                    + config.getDbName() + "?serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&connectTimeout=5000");
             ds.setUsername(config.getDbUser());
             ds.setPassword(config.getDbPwd());
             ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
@@ -184,7 +184,7 @@ public class GameRoutingDataSource extends AbstractRoutingDataSource
         ds.setName(dsName);
         ds.setUrl("jdbc:mysql://" + config.getString("host") + ":" + config.getInteger("port")
                 + "/" + config.getString("db")
-                + "?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai");
+                + "?serverTimezone=Asia/Shanghai&characterEncoding=UTF-8");
         ds.setUsername(config.getString("user"));
         ds.setPassword(config.getString("pwd"));
         ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
